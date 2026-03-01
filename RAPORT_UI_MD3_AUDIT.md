@@ -111,3 +111,13 @@ Wszystkie zidentyfikowane problemy zostały naprawione.
 2. **Przy nowych ekranach:** zawsze sprawdzać, czy `LazyColumn` w `Column` ma `weight(1f)`.
 3. **Placeholder/tekst na ciemnym tle:** minimum 0.55 (etykiety), 0.65 (placeholder).
 4. **Testy na urządzeniu:** sprawdzić SessionCardScreen, CatchPhotoScreen i FishListScreen na różnych rozdzielczościach.
+
+---
+
+## Weryfikacja skilla ui-md3-quality-check (1 marca 2026)
+
+Skill zaktualizowano na podstawie audytu:
+- **Sekcja 4 (Przewijanie):** dodano punkt o `LazyColumn` + `Modifier.weight(1f)` w `Column`
+- **Sekcja 6 (Kontrast):** dodano min. 0.65 dla placeholder
+- **Szybkie wzorce:** dodano wzorzec Spacer w Row (size zamiast height)
+- **Nowa sekcja:** „Typowe błędy” – tabela z najczęstszymi problemami i poprawkami

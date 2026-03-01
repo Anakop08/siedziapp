@@ -44,6 +44,7 @@ Skopiuj poniższą listę i odhaczaj każde sprawdzenie. Każde ❌ wymaga popra
 
 - [ ] Gdy treść przekracza wysokość: `verticalScroll` lub `LazyColumn` – przewijanie działa
 - [ ] `Scaffold` content: `Column` z `verticalScroll` – nie blokowanie scroll
+- [ ] **LazyColumn w Column:** `LazyColumn` wewnątrz `Column` MUSI mieć `Modifier.weight(1f)` – inaczej nie będzie się przewijać (brak ograniczonej wysokości)
 - [ ] Brak `Modifier.fillMaxHeight()` wewnątrz scroll bez ograniczenia – może powodować nieskończoną wysokość
 
 ### 5. Spójność elementów obok siebie
@@ -57,6 +58,7 @@ Skopiuj poniższą listę i odhaczaj każde sprawdzenie. Każde ❌ wymaga popra
 
 - [ ] Tekst na ciemnym tle: minimum `rgba(255,255,255,0.55)` dla etykiet, `#ffffff` dla nagłówków
 - [ ] Brak opacity < 0.5 dla tekstu – nieczytelny
+- [ ] Placeholder: min. `0.65` (design-system §2.7)
 - [ ] Kolory akcentów z projektu (np. CyanTeal, EmeraldGreen) zgodne z design-system.md
 
 ### 7. Design system projektu (jeśli istnieje `design-system.md`)
@@ -103,3 +105,22 @@ Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)
 **Padding standardowy:**
 - Główna treść: `padding(16.dp)` lub `padding(paddingValues)` z Scaffold
 - Między sekcjami: `Spacer(Modifier.height(16.dp))` lub `Arrangement.spacedBy(12.dp)`
+
+**Spacer w Row / Button (ikona + tekst):**
+```kotlin
+// ❌ Błąd – height(8.dp) w Row nie tworzy odstępu poziomego
+Row { Icon(...); Spacer(Modifier.height(8.dp)); Text(...) }
+
+// ✅ Poprawnie
+Row { Icon(...); Spacer(Modifier.size(8.dp)); Text(...) }
+```
+
+---
+
+## Typowe błędy (zweryfikowane w audycie SIEDZI!)
+
+| Błąd | Objaw | Poprawka |
+|------|-------|----------|
+| `LazyColumn` w `Column` bez `weight(1f)` | Lista się nie przewija | `LazyColumn(modifier = Modifier.weight(1f), ...)` |
+| `Spacer(Modifier.height(X.dp))` w `Row`/`Button` | Brak odstępu między ikoną a tekstem | `Spacer(Modifier.size(X.dp))` lub `Modifier.width(X.dp)` |
+| Opacity tekstu &lt; 0.55 | Nieczytelne etykiety na ciemnym tle | Min. `0.55` (etykiety), `0.65` (placeholder) |
