@@ -12,7 +12,10 @@ Aplikacja mobilna dziennika wędkarskiego (Android, Kotlin, Jetpack Compose).
 
 ## Budowanie
 
+**Ważne:** Otwórz w Android Studio folder `SIEDZIapp` (nie katalog główny). Projekt Gradle jest w `SIEDZIapp/`.
+
 ```bash
+cd SIEDZIapp
 ./gradlew assembleDebug
 ```
 
