@@ -1,6 +1,7 @@
 # IDE / Editor
 .Cursor
 .cursor
+!.cursor/rules/
 .idea/
 *.iml
 *.ipr

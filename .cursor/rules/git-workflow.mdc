@@ -1,0 +1,20 @@
+---
+description: Zasady Git na początek i koniec sesji
+alwaysApply: true
+---
+
+# Git – reguły sesji
+
+## Początek sesji
+
+Jeśli repozytorium Git **nie istnieje** (brak `.git` w głównym katalogu projektu):
+
+- **Zasygnalizuj** to użytkownikowi przed rozpoczęciem kolejnych zmian
+- Zaproponuj inicjalizację repozytorium, jeśli ma to sens
+
+## Koniec sesji
+
+Jeśli repozytorium Git **istnieje**:
+
+- Wykonaj **commit** wszystkich zmian (z czytelnym komunikatem)
+- Wykonaj **push** na zdalne repozytorium
