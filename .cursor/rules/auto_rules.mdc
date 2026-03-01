@@ -1,0 +1,45 @@
+---
+description: Reguły autonomii agenta i Git (sesja)
+alwaysApply: true
+---
+
+# Reguły automatyczne – SIEDZI!
+
+## Uprawnienia Agenta
+
+1. **Automatyczne Planowanie**:
+   - Agent ma zgodę na samodzielne tworzenie i zatwierdzanie plików `implementation_plan.md`.
+   - Nie jest wymagane oczekiwanie na akceptację planu, chyba że zmiany są krytyczne (np. usuwanie dużych części kodu).
+   - Po stworzeniu planu agent może od razu przejść do realizacji.
+
+2. **Operacje Terminalowe**:
+   - Agent może wykonywać komendy: odczyt (ls, dir, cat, grep), budowanie (gradlew, npm run build), testowanie, zarządzanie plikami w projekcie.
+   - Wymagaj zgody tylko przy komendach modyfikujących globalne ustawienia systemu lub instalujących nowe oprogramowanie.
+
+3. **Zarządzanie Zadaniami**:
+   - Agent samodzielnie aktualizuje `task.md` i `task_boundary` bez przerywania pracy pytaniami o postęp, dopóki całe zadanie nie zostanie ukończone.
+
+4. **Komunikacja**:
+   - Minimalizuj pytania – pytaj tylko przy: blokujących decyzjach biznesowych, zakończeniu całego zadania, błędach nie do automatycznej naprawy.
+
+## Instrukcja dla Agenta
+
+Przy każdym nowym zadaniu zapoznaj się z tymi regułami i działaj zgodnie z nimi, dążąc do szybkiego dostarczenia gotowego rozwiązania bez zbędnych interakcji.
+
+---
+
+## Git – reguły sesji
+
+### Na początku sesji
+
+Jeśli repozytorium Git **nie istnieje** (brak `.git` w głównym katalogu):
+
+- **Zasygnalizuj** to użytkownikowi przed rozpoczęciem kolejnych zmian
+- Zaproponuj inicjalizację repozytorium, jeśli ma to sens
+
+### Na końcu sesji
+
+Jeśli repozytorium Git **istnieje**:
+
+- Wykonaj **commit** wszystkich zmian (z czytelnym komunikatem)
+- Wykonaj **push** na zdalne repozytorium

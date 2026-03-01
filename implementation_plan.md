@@ -5,7 +5,7 @@
 > Dokument łączy specyfikację z `main_prompt.md`, przepływy z `app_documentation.md`, design system z `design-system.md` oraz flowchart z `flowchart.md`.  
 > Każda faza kończy się checkpointem umożliwiającym kontynuację według metodologii Vibe Coding.
 >
-> **Reguły Git:** `.Cursor/auto_rules.md` – zasady pracy z repozytorium (sygnał przy braku repo, commit+push przy zakończeniu sesji).
+> **Reguły:** `.cursor/rules/auto_rules.mdc` – autonomia agenta, Git (sygnał przy braku repo, commit+push przy zakończeniu sesji).
 
 ---
 
