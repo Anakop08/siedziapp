@@ -3,7 +3,35 @@
 .cursor
 .idea/
 *.iml
+*.ipr
+*.iws
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Gradle
+.gradle/
+build/
+
+# Local config
+local.properties
+
+# Keystore
+*.jks
+*.keystore
+
+# Crashlytics
+crashlytics.properties
+
+# NDK
+obj/
+
+# Kotlin
+*.kotlin_module
