@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 21 Ustawienia / Eksport</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { overflow: hidden; height: 100%; }
+
+        body {
+            background: #0a0a0c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+
+        /* Phone frame */
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #0e0e12;
+            border-radius: 52px;
+            box-shadow: 0 0 0 2px #2a2a2e, 0 0 0 5px #1a1a1e,
+                0 30px 80px rgba(0,0,0,.85), inset 0 0 0 1px #242428;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px; top: 140px;
+            width: 3px; height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px; top: 120px;
+            width: 3px; height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px; left: 50%;
+            transform: translateX(-50%);
+            width: 120px; height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        /* Status bar */
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
+            background: #0e0e12;
+        }
+
+        .status-bar .time { font-size: 14px; font-weight: 600; color: #e0e0e0; }
+        .status-icons { display: flex; gap: 6px; align-items: center; }
+        .status-icons svg { fill: #e0e0e0; }
+
+        /* Top bar (fixed) */
+        .top-bar {
+            padding: 10px 16px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0e0e12;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .back-btn svg { stroke: rgba(255,255,255,.6); }
+
+        .top-title { flex: 1; font-size: 18px; font-weight: 600; color: #fff; }
+        .top-title span { color: #9ca3af; }
+
+        /* Scrollable body */
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            padding-bottom: 12px;
+        }
+
+        .screen-body::-webkit-scrollbar { display: none; }
+
+        /* Section label */
+        .sect-label {
+            padding: 0 16px;
+            margin: 18px 0 8px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.45);
+        }
+
+        /* ---- BACKUP CARD ---- */
+        .backup-card {
+            margin: 14px 16px 0;
+            padding: 16px;
+            background: rgba(55,65,81,.12);
+            border: 1px solid rgba(156,163,175,.18);
+            border-radius: 18px;
+        }
+
+        .backup-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .drive-icon-box {
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .backup-title { font-size: 15px; font-weight: 700; color: rgba(255,255,255,.95); }
+
+        .backup-sync-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 2px;
+        }
+
+        .sync-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 6px rgba(52,211,153,.5);
+            flex-shrink: 0;
+        }
+
+        .sync-text {
+            font-size: 11px;
+            color: #34d399;
+            font-weight: 500;
+        }
+
+        /* Storage bar */
+        .storage-wrap { margin-bottom: 14px; }
+
+        .storage-label-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .storage-label { font-size: 11px; color: rgba(255,255,255,.55); }
+        .storage-val { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.8); }
+
+        .storage-bar {
+            height: 5px;
+            background: rgba(255,255,255,.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .storage-fill {
+            height: 100%;
+            width: 15.3%; /* 2.3 / 15 GB */
+            background: linear-gradient(90deg, #6b7280, #9ca3af);
+            border-radius: 3px;
+        }
+
+        .storage-last-sync {
+            font-size: 10px;
+            color: rgba(255,255,255,.4);
+            margin-top: 5px;
+        }
+
+        /* Backup action buttons */
+        .backup-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .backup-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .backup-btn.primary {
+            background: linear-gradient(135deg, #374151, #4b5563);
+            border: 1px solid rgba(156,163,175,.3);
+            color: #fff;
+        }
+
+        .backup-btn.secondary {
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.1);
+            color: rgba(255,255,255,.75);
+        }
+
+        .backup-btn .btn-icon {
+            width: 16px; height: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .backup-btn .btn-icon .material-icons-outlined {
+            font-size: 16px; width: 16px; height: 16px; line-height: 16px;
+            color: inherit;
+        }
+
+        /* ---- NAVIGATION ROWS (settings items) ---- */
+        .settings-group {
+            margin: 0 16px;
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            cursor: pointer;
+            transition: background .12s;
+            position: relative;
+        }
+
+        .settings-row:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 54px; right: 0;
+            height: 1px;
+            background: rgba(255,255,255,.05);
+        }
+
+        .settings-row:hover { background: rgba(255,255,255,.04); }
+
+        .row-icon-box {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .row-icon-box .material-icons-outlined {
+            font-size: 20px; width: 20px; height: 20px; line-height: 20px;
+        }
+
+        /* Icon box colors */
+        .ib-grey   { background: rgba(107,114,128,.18); }
+        .ib-grey .material-icons-outlined { color: #9ca3af; }
+
+        .ib-teal   { background: rgba(14,116,144,.18); }
+        .ib-teal .material-icons-outlined { color: #22d3ee; }
+
+        .ib-green  { background: rgba(5,150,105,.18); }
+        .ib-green .material-icons-outlined { color: #34d399; }
+
+        .ib-amber  { background: rgba(217,119,6,.18); }
+        .ib-amber .material-icons-outlined { color: #fbbf24; }
+
+        .ib-purple { background: rgba(124,58,237,.18); }
+        .ib-purple .material-icons-outlined { color: #a78bfa; }
+
+        .ib-red    { background: rgba(220,38,38,.14); }
+        .ib-red .material-icons-outlined { color: #f87171; }
+
+        .row-texts { flex: 1; }
+
+        .row-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,.9);
+        }
+
+        .row-sub {
+            font-size: 11px;
+            color: rgba(255,255,255,.5);
+            margin-top: 1px;
+        }
+
+        .row-badge {
+            background: rgba(156,163,175,.15);
+            border: 1px solid rgba(156,163,175,.25);
+            border-radius: 10px;
+            padding: 2px 9px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            flex-shrink: 0;
+        }
+
+        .row-chevron {
+            width: 18px; height: 18px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .row-chevron .material-icons-outlined {
+            font-size: 18px; width: 18px; height: 18px; line-height: 18px;
+            color: rgba(255,255,255,.3);
+        }
+
+        /* ---- THEME SWITCHER ---- */
+        .theme-row {
+            margin: 0 16px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .theme-btn {
+            flex: 1;
+            padding: 11px 8px;
+            border-radius: 14px;
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .theme-btn.active {
+            background: rgba(55,65,81,.2);
+            border-color: rgba(156,163,175,.4);
+        }
+
+        .theme-icon-box {
+            width: 30px; height: 30px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .theme-icon-box .material-icons-outlined {
+            font-size: 17px; width: 17px; height: 17px; line-height: 17px;
+            color: rgba(255,255,255,.45);
+        }
+
+        .theme-btn.active .theme-icon-box { background: rgba(156,163,175,.12); }
+        .theme-btn.active .theme-icon-box .material-icons-outlined { color: #9ca3af; }
+
+        .theme-label {
+            font-size: 10px;
+            font-weight: 500;
+            color: rgba(255,255,255,.5);
+        }
+
+        .theme-btn.active .theme-label { color: #9ca3af; }
+
+        /* ---- About rows ---- */
+        .version-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+        }
+
+        .version-row .row-title { color: rgba(255,255,255,.65); }
+        .version-val { font-size: 13px; color: rgba(255,255,255,.45); flex-shrink: 0; }
+
+        /* Active Session Banner */
+        .session-banner {
+            margin: 0 16px 6px;
+            padding: 9px 14px;
+            background: rgba(14,116,144,.18);
+            border: 1px solid rgba(34,211,238,.25);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .banner-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #22d3ee;
+            box-shadow: 0 0 8px rgba(34,211,238,.6);
+            flex-shrink: 0;
+        }
+        .banner-text {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255,255,255,.8);
+        }
+        .banner-text strong { color: #22d3ee; }
+        .banner-arrow .material-icons-outlined {
+            font-size: 16px; color: rgba(34,211,238,.6);
+        }
+
+        /* Nav bar */
+        .nav-bar {
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-pill {
+            width: 100px; height: 4px;
+            background: rgba(255,255,255,.27);
+            border-radius: 2px;
+        }
+
+        .phone-meta {
+            color: #444;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <p class="screen-label">SIEDZI! · Ekran 21 / 26 · Ustawienia / Eksport</p>
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+            <div class="dynamic-island"></div>
+
+            <!-- Status bar -->
+            <div class="status-bar">
+                <span class="time">19:05</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <rect x="0" y="8" width="3" height="4" rx="0.5"/>
+                        <rect x="4" y="5" width="3" height="7" rx="0.5"/>
+                        <rect x="8" y="2" width="3" height="10" rx="0.5"/>
+                        <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35"/>
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z"/>
+                        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                        <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                    </svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12">
+                        <rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2" fill="none"/>
+                        <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6"/>
+                        <rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Top bar (fixed) -->
+            <div class="top-bar">
+                <div class="back-btn">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 12H5m0 0 7-7m-7 7 7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="top-title">Ustawienia <span>i Eksport</span></div>
+            </div>
+
+            <!-- Scrollable body -->
+            <div class="screen-body">
+
+                <!-- KOPIA I EKSPORT -->
+                <div class="backup-card">
+                    <div class="backup-header">
+                        <div class="drive-icon-box">
+                            <!-- Google Drive SVG icon -->
+                            <svg width="26" height="22" viewBox="0 0 87 78" fill="none">
+                                <path d="M6.4 66L29 27.4L51.7 66H6.4Z" fill="#0F9D58"/>
+                                <path d="M51.7 66L29 27.4L51.7 66Z" fill="#0F9D58"/>
+                                <path d="M29 27.4L51.7 66H80.6L58 27.4H29Z" fill="#00AC47"/>
+                                <path d="M29 27.4L6.4 66H35.3L58 27.4H29Z" fill="#00832D"/>
+                                <path d="M58 27.4H29L43.5 3L58 27.4Z" fill="#00AC47"/>
+                                <path d="M43.5 3L29 27.4H58L43.5 3Z" fill="#0F9D58"/>
+                                <path d="M43.5 3L58 27.4L80.6 66L66.1 27.4L43.5 3Z" fill="#00AC47"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="backup-title">Google Drive</div>
+                            <div class="backup-sync-row">
+                                <div class="sync-dot"></div>
+                                <span class="sync-text">Zsynchronizowano</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="storage-wrap">
+                        <div class="storage-label-row">
+                            <span class="storage-label">Przestrzeń Drive</span>
+                            <span class="storage-val">2,3 GB / 15 GB</span>
+                        </div>
+                        <div class="storage-bar">
+                            <div class="storage-fill"></div>
+                        </div>
+                        <div class="storage-last-sync">Ostatnia synchronizacja: 21 lut 2026, 14:32</div>
+                    </div>
+
+                    <div class="backup-actions">
+                        <div class="backup-btn primary">
+                            <div class="btn-icon"><span class="material-icons-outlined">sync</span></div>
+                            Synchronizuj teraz
+                        </div>
+                        <div class="backup-btn secondary">
+                            <div class="btn-icon"><span class="material-icons-outlined">download</span></div>
+                            Eksportuj ZIP
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SŁOWNIKI -->
+                <div class="sect-label">Słowniki</div>
+                <div class="settings-group">
+                    <div class="settings-row">
+                        <div class="row-icon-box ib-teal">
+                            <span class="material-icons-outlined">phishing</span>
+                        </div>
+                        <div class="row-texts">
+                            <div class="row-title">Wędki i Zestawy</div>
+                            <div class="row-sub">Wędki, kołowrotki, żyłki</div>
+                        </div>
+                        <div class="row-badge">12</div>
+                        <div class="row-chevron"><span class="material-icons-outlined">chevron_right</span></div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="row-icon-box ib-amber">
+                            <span class="material-icons-outlined">set_meal</span>
+                        </div>
+                        <div class="row-texts">
+                            <div class="row-title">Przynęty i Zanęty</div>
+                            <div class="row-sub">Pellet, boile, kukurydza, ochotka…</div>
+                        </div>
+                        <div class="row-badge">24</div>
+                        <div class="row-chevron"><span class="material-icons-outlined">chevron_right</span></div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="row-icon-box ib-grey">
+                            <span class="material-icons-outlined">hardware</span>
+                        </div>
+                        <div class="row-texts">
+                            <div class="row-title">Haczyki i Osprzęt</div>
+                            <div class="row-sub">Haczyki, klipsy, krętliki, ciężarki</div>
+                        </div>
+                        <div class="row-badge">18</div>
+                        <div class="row-chevron"><span class="material-icons-outlined">chevron_right</span></div>
+                    </div>
+                </div>
+
+                <!-- ŁOWISKA -->
+                <div class="sect-label">Łowiska</div>
+                <div class="settings-group">
+                    <div class="settings-row">
+                        <div class="row-icon-box ib-green">
+                            <span class="material-icons-outlined">map</span>
+                        </div>
+                        <div class="row-texts">
+                            <div class="row-title">Zarządzaj Łowiskami</div>
+                            <div class="row-sub">Dodaj, edytuj, usuń łowisko</div>
+                        </div>
+                        <div class="row-badge">3</div>
+                        <div class="row-chevron"><span class="material-icons-outlined">chevron_right</span></div>
+                    </div>
+                </div>
+
+                <!-- MOTYW -->
+                <div class="sect-label">Motyw</div>
+                <div class="theme-row">
+                    <div class="theme-btn" onclick="setTheme(this)">
+                        <div class="theme-icon-box">
+                            <span class="material-icons-outlined">light_mode</span>
+                        </div>
+                        <span class="theme-label">Jasny</span>
+                    </div>
+                    <div class="theme-btn active" onclick="setTheme(this)">
+                        <div class="theme-icon-box">
+                            <span class="material-icons-outlined">dark_mode</span>
+                        </div>
+                        <span class="theme-label">Ciemny</span>
+                    </div>
+                    <div class="theme-btn" onclick="setTheme(this)">
+                        <div class="theme-icon-box">
+                            <span class="material-icons-outlined">palette</span>
+                        </div>
+                        <span class="theme-label">Kolorowy</span>
+                    </div>
+                </div>
+
+                <!-- DANE I PRYWATNOŚĆ -->
+                <div class="sect-label">Dane</div>
+                <div class="settings-group">
+                    <div class="settings-row">
+                        <div class="row-icon-box ib-grey">
+                            <span class="material-icons-outlined">storage</span>
+                        </div>
+                        <div class="row-texts">
+                            <div class="row-title">Pamięć podręczna map</div>
+                            <div class="row-sub">Mapy offline z ostatniej sesji</div>
+                        </div>
+                        <div class="row-badge">0 MB</div>
+                        <div class="row-chevron"><span class="material-icons-outlined">chevron_right</span></div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="row-icon-box ib-red">
+                            <span class="material-icons-outlined">delete_sweep</span>
+                        </div>
+                        <div class="row-texts">
+                            <div class="row-title">Wyczyść dane aplikacji</div>
+                            <div class="row-sub">Usuwa sesje, połowy, słowniki</div>
+                        </div>
+                        <div class="row-chevron"><span class="material-icons-outlined">chevron_right</span></div>
+                    </div>
+                </div>
+
+                <!-- O APLIKACJI -->
+                <div class="sect-label">O aplikacji</div>
+                <div class="settings-group">
+                    <div class="settings-row">
+                        <div class="row-icon-box ib-purple">
+                            <span class="material-icons-outlined">info_outline</span>
+                        </div>
+                        <div class="row-texts">
+                            <div class="row-title">Wersja aplikacji</div>
+                        </div>
+                        <span class="version-val">0.1.0-beta</span>
+                    </div>
+                    <div class="settings-row">
+                        <div class="row-icon-box ib-grey">
+                            <span class="material-icons-outlined">help_outline</span>
+                        </div>
+                        <div class="row-texts">
+                            <div class="row-title">Pomoc i dokumentacja</div>
+                        </div>
+                        <div class="row-chevron"><span class="material-icons-outlined">chevron_right</span></div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="row-icon-box ib-grey">
+                            <span class="material-icons-outlined">privacy_tip</span>
+                        </div>
+                        <div class="row-texts">
+                            <div class="row-title">Polityka prywatności</div>
+                        </div>
+                        <div class="row-chevron"><span class="material-icons-outlined">chevron_right</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Active Session Banner -->
+            <div class="session-banner">
+                <div class="banner-dot"></div>
+                <span class="banner-text"><strong>Sesja aktywna</strong> · 3h 42min</span>
+                <div class="banner-arrow">
+                    <span class="material-icons-outlined">chevron_right</span>
+                </div>
+            </div>
+
+            <!-- Nav bar -->
+            <div class="nav-bar">
+                <div class="nav-pill"></div>
+            </div>
+        </div>
+        <p class="phone-meta">390×844 · Ekran 21 · Ustawienia / Eksport</p>
+    </div>
+    <script>
+        function setTheme(el) {
+            el.parentElement.querySelectorAll('.theme-btn').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            el.classList.add('active');
+        }
+
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 60;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 07 Strateg / Analityk Wyprawy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <script src="weather-icons.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            background: #060f0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #080f0a;
+            border-radius: 52px;
+            box-shadow: 0 0 0 2px #2a2e2a, 0 0 0 5px #1a1e1a,
+                0 30px 80px rgba(0, 0, 0, 0.85), inset 0 0 0 1px #2e3530;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 140px;
+            width: 3px;
+            height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px;
+            top: 120px;
+            width: 3px;
+            height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .status-bar .time {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .status-icons svg {
+            fill: #e0e0e0;
+        }
+
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+        }
+
+        .screen-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Top bar */
+        .top-bar {
+            padding: 6px 8px 8px 4px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #080f0a;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .top-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .top-title span {
+            color: #34d399;
+        }
+
+        /* Step indicator */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 20px 14px;
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .step-dot.done {
+            background: rgba(52, 211, 153, 0.4);
+        }
+
+        .step-dot.active {
+            background: #34d399;
+            box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 1px;
+        }
+
+        .step-line.done {
+            background: rgba(52, 211, 153, 0.3);
+        }
+
+        .step-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .step-label.done {
+            color: rgba(52, 211, 153, 0.6);
+        }
+
+        .step-label.active {
+            color: #34d399;
+            font-weight: 500;
+        }
+
+        /* Trip summary banner */
+        .trip-banner {
+            margin: 0 16px 16px;
+            background: rgba(52, 211, 153, 0.07);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            border-radius: 16px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .trip-banner-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .trip-banner-text {
+            flex: 1;
+        }
+
+        .trip-banner-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .trip-banner-sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            margin-top: 1px;
+        }
+
+        /* Section header */
+        .sect-hdr {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 16px;
+            margin-bottom: 10px;
+        }
+
+        .sect-hdr-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sect-hdr-label {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        /* ── Section A: Warunki pogodowe ── */
+        .weather-card {
+            margin: 0 16px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        /* Forecast day row */
+        .forecast-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            gap: 10px;
+        }
+
+        .forecast-row+.forecast-row {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .forecast-day {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+            width: 30px;
+        }
+
+        .forecast-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .forecast-icon svg {
+            display: block;
+        }
+
+        .forecast-desc {
+            flex: 1;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .forecast-temp {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            width: 36px;
+            text-align: right;
+        }
+
+        .forecast-rain {
+            font-size: 11px;
+            color: #60a5fa;
+            width: 30px;
+            text-align: right;
+        }
+
+        /* Pressure chart */
+        .pressure-card {
+            margin: 0 16px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 18px;
+            padding: 14px;
+        }
+
+        .pressure-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .pressure-val {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .pressure-val span {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.4);
+            margin-left: 3px;
+        }
+
+        .pressure-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(52, 211, 153, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            border-radius: 10px;
+            padding: 4px 9px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #34d399;
+        }
+
+        /* SVG mini chart */
+        .mini-chart {
+            width: 100%;
+            height: 44px;
+            display: block;
+        }
+
+        .chart-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.25);
+            margin-top: 4px;
+        }
+
+        /* Solunar card */
+        .solunar-card {
+            margin: 0 16px 16px;
+            background: rgba(251, 191, 36, 0.06);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-radius: 18px;
+            padding: 14px;
+        }
+
+        .solunar-rating {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .sol-bar {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(251, 191, 36, 0.15);
+        }
+
+        .sol-bar.filled {
+            background: #fbbf24;
+        }
+
+        .sol-bar.half {
+            background: linear-gradient(90deg, #fbbf24 50%, rgba(251, 191, 36, 0.15) 50%);
+        }
+
+        .sol-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #fbbf24;
+            margin-left: 6px;
+        }
+
+        .solunar-times {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sol-window {
+            flex: 1;
+            background: rgba(251, 191, 36, 0.08);
+            border-radius: 12px;
+            padding: 9px 10px;
+            border: 1px solid rgba(251, 191, 36, 0.15);
+        }
+
+        .sol-win-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(251, 191, 36, 0.5);
+        }
+
+        .sol-win-time {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fbbf24;
+            margin: 2px 0 1px;
+        }
+
+        .sol-win-dur {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .sol-win-type {
+            font-size: 10px;
+            color: rgba(251, 191, 36, 0.7);
+            margin-top: 3px;
+        }
+
+        .solunar-desc {
+            margin-top: 10px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .solunar-desc strong {
+            color: #fbbf24;
+            font-style: normal;
+        }
+
+        /* ── Section B: Historia ── */
+        .history-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 0 16px;
+            margin-bottom: 10px;
+        }
+
+        .hist-tab {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+        }
+
+        .hist-tab.active {
+            background: rgba(52, 211, 153, 0.15);
+            border-color: rgba(52, 211, 153, 0.4);
+            color: #34d399;
+        }
+
+        .history-card {
+            margin: 0 16px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 18px;
+            padding: 14px;
+        }
+
+        .hist-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+        }
+
+        .hist-row+.hist-row {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .hist-metric {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .hist-compare {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hist-val {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .hist-diff {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 7px;
+            border-radius: 8px;
+        }
+
+        .hist-diff.up {
+            background: rgba(52, 211, 153, 0.15);
+            color: #34d399;
+        }
+
+        .hist-diff.down {
+            background: rgba(248, 113, 113, 0.15);
+            color: #f87171;
+        }
+
+        .hist-diff.same {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Insight quote */
+        .insight-badge {
+            margin: 0 16px 16px;
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-left: 3px solid #7c3aed;
+            border-radius: 0 14px 14px 0;
+            padding: 10px 14px;
+        }
+
+        .insight-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(139, 92, 246, 0.6);
+            margin-bottom: 4px;
+        }
+
+        .insight-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.5;
+        }
+
+        .insight-text strong {
+            color: #a78bfa;
+        }
+
+        /* ── Notatnik Strategii ── */
+        .notes-card {
+            margin: 0 16px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(52, 211, 153, 0.2);
+            border-radius: 18px;
+            padding: 14px;
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .notes-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .notes-chars {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .notes-body {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.6;
+            min-height: 64px;
+        }
+
+        .notes-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 14px;
+            background: #34d399;
+            vertical-align: middle;
+            margin-left: 2px;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0
+            }
+        }
+
+        /* CTA */
+        .cta-wrap {
+            padding: 8px 16px 6px;
+        }
+
+        .cta-btn {
+            background: linear-gradient(135deg, #059669, #047857);
+            border-radius: 16px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.35);
+            transition: transform 0.15s;
+        }
+
+        .cta-btn:active {
+            transform: scale(0.98);
+        }
+
+        .cta-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .cta-sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.65);
+            margin-top: 1px;
+        }
+
+        .cta-arrow {
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.7);
+            flex-shrink: 0;
+        }
+
+        .nav-bar {
+            height: 34px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-pill {
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.27);
+            border-radius: 2px;
+        }
+
+        .phone-meta {
+            color: #444;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <p class="screen-label">SIEDZI! · Ekran 07 / 26 · Strateg / Analityk Wyprawy</p>
+
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+            <div class="dynamic-island"></div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span class="time">08:22</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <rect x="0" y="8" width="3" height="4" rx="0.5" />
+                        <rect x="4" y="5" width="3" height="7" rx="0.5" />
+                        <rect x="8" y="2" width="3" height="10" rx="0.5" />
+                        <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35" />
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z" />
+                        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                            stroke-linecap="round" />
+                        <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                            stroke-linecap="round" />
+                    </svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12">
+                        <rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2"
+                            fill="none" />
+                        <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6" />
+                        <rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="screen-body">
+
+                <!-- Top bar -->
+                <div class="top-bar">
+                    <div class="back-btn"><span class="material-icons-outlined">arrow_back</span></div>
+                    <div class="top-title">Analityk <span>Wyprawy</span></div>
+                </div>
+
+                <!-- Step indicator: Krok 3/3 -->
+                <div class="step-indicator">
+                    <div class="step-dot done"></div>
+                    <div class="step-label done">Termin</div>
+                    <div class="step-line done"></div>
+                    <div class="step-dot done"></div>
+                    <div class="step-label done">Łowisko</div>
+                    <div class="step-line done"></div>
+                    <div class="step-dot active"></div>
+                    <div class="step-label active">Analiza</div>
+                </div>
+
+                <!-- Trip summary -->
+                <div class="trip-banner">
+                    <div class="trip-banner-icon">🗺️</div>
+                    <div class="trip-banner-text">
+                        <div class="trip-banner-title">Jezioro Białe · 20–23 marca 2026</div>
+                        <div class="trip-banner-sub">4 dni · Mazury, pow. giżycki</div>
+                    </div>
+                </div>
+
+                <!-- ── A) WARUNKI ── -->
+                <div class="sect-hdr">
+                    <div class="sect-hdr-icon" style="background:rgba(96,165,250,0.15);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M4 17c0-2.2 1.8-4 4-4h9c1.7 0 3-1.3 3-3s-1.3-3-3-3c-.2-1.5-1.5-2.5-3-2.5-1.4 0-2.5.9-2.9 2.1C10.5 6.2 9.8 6 9 6c-2.2 0-4 1.8-4 4h-.1C3.3 10.3 2 11.6 2 13.2c0 1.5 1.2 2.8 2.7 2.8H4z"
+                                fill="rgba(147,197,253,0.7)" />
+                        </svg>
+                    </div>
+                    <div class="sect-hdr-label">A · Warunki Pogody</div>
+                </div>
+
+                <!-- Forecast 4 days -->
+                <div class="weather-card">
+                    <div class="forecast-row">
+                        <div class="forecast-day">Pt</div>
+                        <div class="forecast-icon" data-weather-icon="partly-cloudy-day" data-size="28"></div>
+                        <div class="forecast-desc">Zmienne zachmurzenie</div>
+                        <div class="forecast-temp">5°C</div>
+                        <div class="forecast-rain" style="color:rgba(255,255,255,0.2)">—</div>
+                    </div>
+                    <div class="forecast-row">
+                        <div class="forecast-day">So</div>
+                        <div class="forecast-icon" data-weather-icon="clear-day" data-size="28"></div>
+                        <div class="forecast-desc">Słonecznie, wiatr 8 km/h</div>
+                        <div class="forecast-temp">8°C</div>
+                        <div class="forecast-rain" style="color:rgba(255,255,255,0.2)">—</div>
+                    </div>
+                    <div class="forecast-row">
+                        <div class="forecast-day">Nd</div>
+                        <div class="forecast-icon" data-weather-icon="drizzle" data-size="28"></div>
+                        <div class="forecast-desc">Przelotny deszcz</div>
+                        <div class="forecast-temp">6°C</div>
+                        <div class="forecast-rain">30%</div>
+                    </div>
+                    <div class="forecast-row">
+                        <div class="forecast-day">Pn</div>
+                        <div class="forecast-icon" data-weather-icon="rain" data-size="28"></div>
+                        <div class="forecast-desc">Zachmurzenie duże</div>
+                        <div class="forecast-temp">4°C</div>
+                        <div class="forecast-rain">60%</div>
+                    </div>
+                </div>
+
+                <!-- Pressure chart -->
+                <div class="pressure-card">
+                    <div class="pressure-header">
+                        <div>
+                            <div
+                                style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);margin-bottom:2px;">
+                                Ciśnienie atmosferyczne</div>
+                            <div class="pressure-val">1018 <span>hPa</span></div>
+                        </div>
+                        <div class="pressure-trend">↗ Rosnące</div>
+                    </div>
+                    <!-- Mini bar chart using inline SVG -->
+                    <svg class="mini-chart" viewBox="0 0 326 44" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="pgGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#34d399" stop-opacity="0.4" />
+                                <stop offset="100%" stop-color="#34d399" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Area fill -->
+                        <path d="M0,38 L54,28 L109,22 L163,18 L218,16 L272,14 L326,20 L326,44 L0,44 Z"
+                            fill="url(#pgGrad)" />
+                        <!-- Line -->
+                        <path d="M0,38 L54,28 L109,22 L163,18 L218,16 L272,14 L326,20" fill="none" stroke="#34d399"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <!-- Dots -->
+                        <circle cx="0" cy="38" r="3" fill="#34d399" />
+                        <circle cx="54" cy="28" r="3" fill="#34d399" />
+                        <circle cx="109" cy="22" r="3" fill="#34d399" />
+                        <circle cx="163" cy="18" r="3.5" fill="#34d399" stroke="#080f0a" stroke-width="1.5" />
+                        <circle cx="218" cy="16" r="3" fill="#34d399" />
+                        <circle cx="272" cy="14" r="3" fill="#34d399" />
+                        <circle cx="326" cy="20" r="3" fill="#34d399" />
+                    </svg>
+                    <div class="chart-label-row">
+                        <span>Pt 20</span><span>So 21</span><span>Nd 22</span><span>Pn 23</span><span>Wt
+                            24</span><span>Śr 25</span><span>Cz 26</span>
+                    </div>
+                </div>
+
+                <!-- Solunar -->
+                <div class="sect-hdr" style="margin-top:2px;">
+                    <div class="sect-hdr-icon" style="background:rgba(251,191,36,0.15);">
+                        <span style="font-size:14px;line-height:1;">🌙</span>
+                    </div>
+                    <div class="sect-hdr-label">Kalendarz Solunarny</div>
+                </div>
+
+                <div class="solunar-card">
+                    <div class="solunar-rating">
+                        <div class="sol-bar filled"></div>
+                        <div class="sol-bar filled"></div>
+                        <div class="sol-bar filled"></div>
+                        <div class="sol-bar half"></div>
+                        <div class="sol-bar"></div>
+                        <div class="sol-label">Bardzo dobry dzień</div>
+                    </div>
+                    <div class="solunar-times">
+                        <div class="sol-window">
+                            <div class="sol-win-label">Szczyt Główny</div>
+                            <div class="sol-win-time">09:40</div>
+                            <div class="sol-win-dur">1h 20min</div>
+                            <div class="sol-win-type">🌙 Księżyc góruje</div>
+                        </div>
+                        <div class="sol-window">
+                            <div class="sol-win-label">Szczyt Poboczny</div>
+                            <div class="sol-win-time">21:55</div>
+                            <div class="sol-win-dur">45 min</div>
+                            <div class="sol-win-type">🟡 Wschód / zachód</div>
+                        </div>
+                        <div class="sol-window">
+                            <div class="sol-win-label">Świt Połowów</div>
+                            <div class="sol-win-time">06:18</div>
+                            <div class="sol-win-dur">40 min</div>
+                            <div class="sol-win-type">🌅 Złota godzina</div>
+                        </div>
+                    </div>
+                    <div class="solunar-desc">
+                        Sobota 21 marca jest <strong>najlepszym dniem wyprawy</strong>. Rosnące ciśnienie + szczyt
+                        solunarny o 09:40 sprzyjają aktywności karpia i sandacza.
+                    </div>
+                </div>
+
+                <!-- ── B) HISTORIA ── -->
+                <div class="sect-hdr">
+                    <div class="sect-hdr-icon" style="background:rgba(139,92,246,0.15);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z" stroke="#a78bfa"
+                                stroke-width="1.8" fill="none" />
+                            <path d="M12 7v5l3 3" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <div class="sect-hdr-label">B · Historia – Zeszły Rok</div>
+                </div>
+
+                <div class="history-tabs">
+                    <div class="hist-tab active">Przed rokiem</div>
+                    <div class="hist-tab">Śr. 5-letnia</div>
+                </div>
+
+                <div class="history-card">
+                    <div class="hist-row">
+                        <div class="hist-metric">Temp. powietrza</div>
+                        <div class="hist-compare">
+                            <div class="hist-val">3°C</div>
+                            <div class="hist-diff up">+2°C teraz</div>
+                        </div>
+                    </div>
+                    <div class="hist-row">
+                        <div class="hist-metric">Ciśnienie</div>
+                        <div class="hist-compare">
+                            <div class="hist-val">1008 hPa</div>
+                            <div class="hist-diff up">+10 hPa ↑</div>
+                        </div>
+                    </div>
+                    <div class="hist-row">
+                        <div class="hist-metric">Połowy Karp</div>
+                        <div class="hist-compare">
+                            <div class="hist-val">2 szt.</div>
+                            <div class="hist-diff same">≈ podobnie</div>
+                        </div>
+                    </div>
+                    <div class="hist-row">
+                        <div class="hist-metric">Łączna waga</div>
+                        <div class="hist-compare">
+                            <div class="hist-val">9.4 kg</div>
+                            <div class="hist-diff up">rekord: 14.8 kg</div>
+                        </div>
+                    </div>
+                    <div class="hist-row">
+                        <div class="hist-metric">Pora połowu</div>
+                        <div class="hist-compare">
+                            <div class="hist-val">08:20–11:40</div>
+                            <div class="hist-diff same">zbliżona</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insight -->
+                <div class="insight-badge">
+                    <div class="insight-label">💡 Insight AI</div>
+                    <div class="insight-text">
+                        W marcu ubiegłego roku przy <strong>rosnącym ciśnieniu</strong> Karp brał głównie w godzinach
+                        porannych, przed godziną 11:00. Rekomendacja: zarzuć o <strong>świcie i wyjdź przed solunarnym
+                            szczytem</strong>.
+                    </div>
+                </div>
+
+                <!-- Notatnik strategii -->
+                <div class="sect-hdr">
+                    <div class="sect-hdr-icon" style="background:rgba(52,211,153,0.12);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <rect x="4" y="3" width="16" height="18" rx="2" stroke="#34d399" stroke-width="1.8"
+                                fill="none" />
+                            <line x1="8" y1="8" x2="16" y2="8" stroke="#34d399" stroke-width="1.4"
+                                stroke-linecap="round" />
+                            <line x1="8" y1="12" x2="16" y2="12" stroke="#34d399" stroke-width="1.4"
+                                stroke-linecap="round" />
+                            <line x1="8" y1="16" x2="12" y2="16" stroke="#34d399" stroke-width="1.4"
+                                stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <div class="sect-hdr-label">Notatnik Strategii</div>
+                </div>
+
+                <div class="notes-card">
+                    <div class="notes-header">
+                        <div class="notes-title">Moje spostrzeżenia</div>
+                        <div class="notes-chars">141/500</div>
+                    </div>
+                    <div class="notes-body">
+                        Sobota rano priorytet – solunar + rosnące ciśnienie. Stanowisko 3 przy trzcinach. Przynęta:
+                        kukurydza + boilie truskawkowe. Zapasowy zestaw: gruntowy na leszcza.<span
+                            class="notes-cursor"></span>
+                    </div>
+                </div>
+
+                <div style="height:70px;"></div>
+
+            </div><!-- /.screen-body -->
+
+            <!-- CTA -->
+            <div class="cta-wrap">
+                <div class="cta-btn">
+                    <div>
+                        <div class="cta-label">Zatwierdź i Zapisz Wyprawę</div>
+                        <div class="cta-sub">Plan gotowy – zobaczymy się nad wodą! 🎣</div>
+                    </div>
+                    <div class="cta-arrow">›</div>
+                </div>
+            </div>
+
+            <div class="nav-bar">
+                <div class="nav-pill"></div>
+            </div>
+        </div>
+        <p class="phone-meta">390 × 844 · Android · MD3 Dark · Strateg / Analityk Wyprawy</p>
+    </div>
+
+    <script>
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 60;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+</body>
+
+</html>

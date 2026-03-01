@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 20 Galeria: Karuzela + Udostępnianie</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { overflow: hidden; height: 100%; }
+
+        body {
+            background: #060610;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .state-toggle-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .state-toggle-btn {
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.12);
+            color: rgba(255,255,255,.5);
+            transition: all .2s;
+        }
+
+        .state-toggle-btn.active {
+            background: rgba(124,58,237,.25);
+            border-color: rgba(167,139,250,.4);
+            color: #c4b5fd;
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+
+        /* Phone frame */
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #08080e;
+            border-radius: 52px;
+            box-shadow: 0 0 0 2px #2a2a2e, 0 0 0 5px #1a1a1e,
+                0 30px 80px rgba(0,0,0,.85), inset 0 0 0 1px #25203a;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px; top: 140px;
+            width: 3px; height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px; top: 120px;
+            width: 3px; height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px; left: 50%;
+            transform: translateX(-50%);
+            width: 120px; height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        /* Status bar */
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
+            background: #08080e;
+        }
+
+        .status-bar .time { font-size: 14px; font-weight: 600; color: #e0e0e0; }
+        .status-icons { display: flex; gap: 6px; align-items: center; }
+        .status-icons svg { fill: #e0e0e0; }
+
+        /* Top bar (fixed) */
+        .top-bar {
+            padding: 8px 16px 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #08080e;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            flex-shrink: 0;
+        }
+
+        .close-btn {
+            width: 38px; height: 38px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .close-btn .material-icons-outlined {
+            font-size: 20px; width: 20px; height: 20px; line-height: 20px;
+            color: rgba(255,255,255,.7);
+        }
+
+        .top-center { flex: 1; text-align: center; }
+        .top-counter {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,.8);
+        }
+
+        .top-counter span { color: #a78bfa; }
+
+        .top-title-fish {
+            font-size: 11px;
+            color: rgba(255,255,255,.5);
+            margin-top: 1px;
+        }
+
+        .more-btn {
+            width: 38px; height: 38px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .more-btn .material-icons-outlined {
+            font-size: 20px; width: 20px; height: 20px; line-height: 20px;
+            color: rgba(255,255,255,.7);
+        }
+
+        /* Scrollable body */
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+        }
+
+        .screen-body::-webkit-scrollbar { display: none; }
+
+        /* ---- PHOTO CAROUSEL AREA ---- */
+        .carousel-area {
+            position: relative;
+            width: 390px;
+            height: 310px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .photo-main {
+            width: 100%; height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+            background: linear-gradient(
+                160deg,
+                rgba(14,116,144,.3) 0%,
+                rgba(30,20,80,.5) 35%,
+                rgba(8,5,25,.8) 65%,
+                rgba(5,10,5,.9) 100%
+            );
+            position: relative;
+        }
+
+        /* Subtle water texture effect */
+        .photo-main::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(251,191,36,.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(14,116,144,.15) 0%, transparent 50%);
+        }
+
+        .photo-fish-svg {
+            position: relative;
+            z-index: 1;
+        }
+
+        .photo-fish-name {
+            position: relative;
+            z-index: 1;
+            font-size: 16px;
+            font-weight: 700;
+            color: rgba(255,255,255,.9);
+        }
+
+        .photo-fish-weight {
+            position: relative;
+            z-index: 1;
+            font-size: 22px;
+            font-weight: 900;
+            color: #fbbf24;
+        }
+
+        /* Swipe arrows */
+        .swipe-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: rgba(0,0,0,.4);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        .swipe-arrow.left { left: 12px; }
+        .swipe-arrow.right { right: 12px; }
+
+        .swipe-arrow .material-icons-outlined {
+            font-size: 20px; width: 20px; height: 20px; line-height: 20px;
+            color: rgba(255,255,255,.8);
+        }
+
+        /* Gradient fade bottom */
+        .photo-main::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, rgba(8,8,14,.9));
+        }
+
+        /* Dot indicators */
+        .photo-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 0 12px;
+            flex-shrink: 0;
+        }
+
+        .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.2);
+            transition: all .2s;
+        }
+
+        .dot.active {
+            width: 18px;
+            border-radius: 3px;
+            background: #a78bfa;
+        }
+
+        /* ---- Fish details card ---- */
+        .fish-detail-card {
+            margin: 0 16px 12px;
+            padding: 13px 14px;
+            background: rgba(124,58,237,.07);
+            border: 1px solid rgba(124,58,237,.2);
+            border-radius: 16px;
+        }
+
+        .fdc-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .fdc-fish-icon {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(251,191,36,.12);
+            border: 1px solid rgba(251,191,36,.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .fdc-name-col { flex: 1; }
+
+        .fdc-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: rgba(255,255,255,.95);
+        }
+
+        .fdc-nickname {
+            font-size: 11px;
+            font-style: italic;
+            color: #fbbf24;
+            margin-top: 1px;
+        }
+
+        .fdc-weight {
+            font-size: 22px;
+            font-weight: 900;
+            color: #fbbf24;
+            flex-shrink: 0;
+        }
+
+        .fdc-weight-unit {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255,255,255,.5);
+        }
+
+        .fdc-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .fdc-tag {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            padding: 3px 9px;
+            border-radius: 10px;
+        }
+
+        .fdc-tag .ti {
+            width: 13px; height: 13px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fdc-tag .ti .material-icons-outlined {
+            font-size: 12px; width: 12px; height: 12px; line-height: 12px;
+        }
+
+        .fdc-tag.amber {
+            background: rgba(251,191,36,.08);
+            border: 1px solid rgba(251,191,36,.2);
+            color: rgba(255,255,255,.8);
+        }
+
+        .fdc-tag.amber .ti .material-icons-outlined { color: rgba(251,191,36,.7); }
+
+        .fdc-tag.teal {
+            background: rgba(34,211,238,.06);
+            border: 1px solid rgba(34,211,238,.15);
+            color: rgba(255,255,255,.75);
+        }
+
+        .fdc-tag.teal .ti .material-icons-outlined { color: rgba(34,211,238,.7); }
+
+        .fdc-tag.grey {
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.1);
+            color: rgba(255,255,255,.65);
+        }
+
+        .fdc-tag.grey .ti .material-icons-outlined { color: rgba(255,255,255,.4); }
+
+        .fdc-tag.purple {
+            background: rgba(139,92,246,.1);
+            border: 1px solid rgba(139,92,246,.22);
+            color: rgba(196,181,253,.9);
+        }
+
+        .fdc-tag.purple .ti .material-icons-outlined { color: rgba(167,139,250,.8); }
+
+        /* ---- Action row ---- */
+        .action-row {
+            margin: 0 16px 12px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px 6px;
+            border-radius: 14px;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,.08);
+        }
+
+        .action-btn .ab-icon {
+            width: 22px; height: 22px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn .ab-icon .material-icons-outlined {
+            font-size: 20px; width: 20px; height: 20px; line-height: 20px;
+            color: rgba(255,255,255,.6);
+        }
+
+        .action-btn .ab-label {
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            color: rgba(255,255,255,.5);
+            text-align: center;
+        }
+
+        .action-btn.danger .ab-icon .material-icons-outlined { color: rgba(239,68,68,.7); }
+        .action-btn.danger .ab-label { color: rgba(239,68,68,.6); }
+        .action-btn.danger { border-color: rgba(239,68,68,.15); }
+
+        /* ---- CTA share (fixed, poza screen-body) ---- */
+        .cta-wrap {
+            padding: 10px 16px 14px;
+            flex-shrink: 0;
+            border-top: 1px solid rgba(255,255,255,.06);
+        }
+
+        .cta-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            border: 1px solid rgba(167,139,250,.4);
+            border-radius: 18px;
+            padding: 13px 20px;
+            cursor: pointer;
+            transition: transform .15s;
+        }
+
+        .cta-btn:active { transform: scale(0.98); }
+
+        .cta-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cta-icon {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .cta-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .cta-sub {
+            font-size: 11px;
+            color: rgba(255,255,255,.7);
+            margin-top: 2px;
+        }
+
+        .cta-arrow {
+            font-size: 24px;
+            color: rgba(255,255,255,.9);
+        }
+
+        /* =======================================
+           SHARE BOTTOM SHEET
+           ======================================= */
+
+        .share-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background: rgba(0,0,0,.65);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .share-sheet {
+            background: #111020;
+            border-top: 1px solid rgba(167,139,250,.2);
+            border-radius: 26px 26px 0 0;
+        }
+
+        .sheet-handle {
+            width: 40px; height: 4px;
+            background: rgba(255,255,255,.18);
+            border-radius: 2px;
+            margin: 10px auto 16px;
+        }
+
+        .sheet-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            padding: 0 22px;
+            margin-bottom: 14px;
+        }
+
+        /* Auto-opis toggle */
+        .autodesc-row {
+            margin: 0 22px 14px;
+            padding: 12px 14px;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 14px;
+        }
+
+        .autodesc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .autodesc-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,.9);
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            width: 42px; height: 24px;
+            border-radius: 12px;
+            background: #7c3aed;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .toggle-knob {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            transition: right .2s;
+        }
+
+        .toggle-switch.off {
+            background: rgba(255,255,255,.15);
+        }
+
+        .toggle-switch.off .toggle-knob {
+            right: auto;
+            left: 3px;
+        }
+
+        .autodesc-preview {
+            font-size: 11px;
+            color: rgba(255,255,255,.55);
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .autodesc-preview .preview-text { color: rgba(196,181,253,.8); }
+
+        /* App icons grid */
+        .share-apps-label {
+            padding: 0 22px 10px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.45);
+        }
+
+        .share-apps-row {
+            padding: 0 16px 20px;
+            display: flex;
+            gap: 0;
+            justify-content: space-between;
+        }
+
+        .share-app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 58px;
+            cursor: pointer;
+        }
+
+        .share-app-icon {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .share-app-icon .material-icons-outlined {
+            font-size: 24px; width: 24px; height: 24px; line-height: 24px;
+            color: #fff;
+        }
+
+        .share-app-label {
+            font-size: 10px;
+            color: rgba(255,255,255,.6);
+            text-align: center;
+        }
+
+        /* App icon colors */
+        .app-instagram { background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); }
+        .app-facebook  { background: #1877f2; }
+        .app-whatsapp  { background: #25d366; }
+        .app-messenger { background: linear-gradient(135deg, #0084ff, #a033ff); }
+        .app-copy      { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); }
+        .app-copy .material-icons-outlined { color: rgba(255,255,255,.7); }
+
+        /* Active Session Banner */
+        .session-banner {
+            margin: 0 16px 6px;
+            padding: 9px 14px;
+            background: rgba(14,116,144,.18);
+            border: 1px solid rgba(34,211,238,.25);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .banner-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #22d3ee;
+            box-shadow: 0 0 8px rgba(34,211,238,.6);
+            flex-shrink: 0;
+        }
+        .banner-text {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255,255,255,.8);
+        }
+        .banner-text strong { color: #22d3ee; }
+        .banner-arrow .material-icons-outlined {
+            font-size: 16px; color: rgba(34,211,238,.6);
+        }
+
+        /* Nav bar */
+        .nav-bar {
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 41;
+            background: #08080e;
+        }
+
+        .nav-pill {
+            width: 100px; height: 4px;
+            background: rgba(255,255,255,.27);
+            border-radius: 2px;
+        }
+
+        .phone-meta {
+            color: #444;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <p class="screen-label">SIEDZI! · Ekran 20 / 26 · Galeria: Karuzela + Udostępnianie</p>
+    <div class="state-toggle-row">
+        <button class="state-toggle-btn active" id="btnKaruzela" onclick="setState('karuzela')">① Karuzela</button>
+        <button class="state-toggle-btn" id="btnShare" onclick="setState('share')">② Udostępnianie</button>
+    </div>
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+            <div class="dynamic-island"></div>
+
+            <!-- Status bar -->
+            <div class="status-bar">
+                <span class="time">18:50</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <rect x="0" y="8" width="3" height="4" rx="0.5"/>
+                        <rect x="4" y="5" width="3" height="7" rx="0.5"/>
+                        <rect x="8" y="2" width="3" height="10" rx="0.5"/>
+                        <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35"/>
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z"/>
+                        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                        <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                    </svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12">
+                        <rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2" fill="none"/>
+                        <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6"/>
+                        <rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Top bar (fixed) -->
+            <div class="top-bar">
+                <div class="close-btn">
+                    <span class="material-icons-outlined">close</span>
+                </div>
+                <div class="top-center">
+                    <div class="top-counter"><span>2</span> / 5</div>
+                    <div class="top-title-fish">Karp · „Wielka Berta"</div>
+                </div>
+                <div class="more-btn">
+                    <span class="material-icons-outlined">more_vert</span>
+                </div>
+            </div>
+
+            <!-- Photo carousel area (fixed) -->
+            <div class="carousel-area">
+                <div class="photo-main">
+                    <div class="photo-fish-svg">
+                        <!-- Karp SVG – duży -->
+                        <svg width="110" height="70" viewBox="0 0 110 68" fill="none">
+                            <path d="M5 34 C5 34 20 6 44 12 C65 17 88 24 104 34 C88 44 65 51 44 56 C20 62 5 34 5 34Z"
+                                fill="rgba(251,191,36,.65)"/>
+                            <path d="M104 34 L110 20 M104 34 L110 48"
+                                stroke="rgba(251,191,36,.65)" stroke-width="3.5" stroke-linecap="round"/>
+                            <circle cx="28" cy="30" r="5" fill="rgba(0,0,0,.4)"/>
+                            <circle cx="26" cy="29" r="2" fill="rgba(255,255,255,.5)"/>
+                            <!-- Scale texture hint -->
+                            <ellipse cx="60" cy="30" rx="8" ry="5" fill="none" stroke="rgba(251,191,36,.3)" stroke-width="1"/>
+                            <ellipse cx="75" cy="35" rx="7" ry="4" fill="none" stroke="rgba(251,191,36,.25)" stroke-width="1"/>
+                            <ellipse cx="50" cy="38" rx="7" ry="4" fill="none" stroke="rgba(251,191,36,.2)" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <div class="photo-fish-name">Karp</div>
+                    <div class="photo-fish-weight">4,1 kg</div>
+                </div>
+                <!-- Swipe arrows -->
+                <div class="swipe-arrow left">
+                    <span class="material-icons-outlined">chevron_left</span>
+                </div>
+                <div class="swipe-arrow right">
+                    <span class="material-icons-outlined">chevron_right</span>
+                </div>
+            </div>
+
+            <!-- Dot indicators (fixed) -->
+            <div class="photo-dots">
+                <div class="dot"></div>
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+
+            <!-- Scrollable body -->
+            <div class="screen-body">
+
+                <!-- Fish detail card -->
+                <div class="fish-detail-card">
+                    <div class="fdc-top">
+                        <div class="fdc-fish-icon">
+                            <svg width="26" height="16" viewBox="0 0 36 22" fill="none">
+                                <path d="M2 11 C2 11 8 2 18 4 C26 5.5 32 8 34 11 C32 14 26 16.5 18 18 C8 20 2 11 2 11Z"
+                                    fill="rgba(251,191,36,.7)"/>
+                                <path d="M34 11 L36 6 M34 11 L36 16" stroke="rgba(251,191,36,.7)" stroke-width="1.5" stroke-linecap="round"/>
+                                <circle cx="10" cy="10" r="1.5" fill="#08080e"/>
+                            </svg>
+                        </div>
+                        <div class="fdc-name-col">
+                            <div class="fdc-name">Karp</div>
+                            <div class="fdc-nickname">„Wielka Berta"</div>
+                        </div>
+                        <div class="fdc-weight">4,1 <span class="fdc-weight-unit">kg</span></div>
+                    </div>
+                    <div class="fdc-tags">
+                        <span class="fdc-tag amber">
+                            <div class="ti"><span class="material-icons-outlined">straighten</span></div>
+                            58 cm
+                        </span>
+                        <span class="fdc-tag teal">
+                            <div class="ti"><span class="material-icons-outlined">location_on</span></div>
+                            Jezioro Mielnickie
+                        </span>
+                        <span class="fdc-tag grey">
+                            <div class="ti"><span class="material-icons-outlined">schedule</span></div>
+                            13:55 · 21 lut 2026
+                        </span>
+                        <span class="fdc-tag purple">
+                            <div class="ti"><span class="material-icons-outlined">set_meal</span></div>
+                            Kukurydza
+                        </span>
+                        <span class="fdc-tag grey">
+                            <div class="ti"><span class="material-icons-outlined">auto_awesome</span></div>
+                            Solunar: Major
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Action row -->
+                <div class="action-row">
+                    <div class="action-btn">
+                        <div class="ab-icon"><span class="material-icons-outlined">star_outline</span></div>
+                        <span class="ab-label">Ustaw główne</span>
+                    </div>
+                    <div class="action-btn">
+                        <div class="ab-icon"><span class="material-icons-outlined">swap_vert</span></div>
+                        <span class="ab-label">Kolejność</span>
+                    </div>
+                    <div class="action-btn">
+                        <div class="ab-icon"><span class="material-icons-outlined">crop</span></div>
+                        <span class="ab-label">Przytnij</span>
+                    </div>
+                    <div class="action-btn danger">
+                        <div class="ab-icon"><span class="material-icons-outlined">delete_outline</span></div>
+                        <span class="ab-label">Usuń</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CTA Share (fixed, poza screen-body) -->
+            <div class="cta-wrap">
+                <div class="cta-btn" onclick="setState('share')">
+                    <div class="cta-left">
+                        <div class="cta-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <circle cx="18" cy="5" r="3" stroke="#fff" stroke-width="2"/>
+                                <circle cx="6" cy="12" r="3" stroke="#fff" stroke-width="2"/>
+                                <circle cx="18" cy="19" r="3" stroke="#fff" stroke-width="2"/>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="cta-label">Udostępnij zdjęcie</div>
+                            <div class="cta-sub">Instagram, Facebook, WhatsApp…</div>
+                        </div>
+                    </div>
+                    <div class="cta-arrow">›</div>
+                </div>
+            </div>
+
+            <!-- SHARE SHEET OVERLAY (stan B) -->
+            <div class="share-overlay" id="shareOverlay" style="display:none" onclick="overlayClose(event)">
+                <div class="share-sheet" onclick="event.stopPropagation()">
+                    <div class="sheet-handle"></div>
+                    <div class="sheet-title">Udostępnij zdjęcie</div>
+
+                    <!-- Auto-opis toggle -->
+                    <div class="autodesc-row">
+                        <div class="autodesc-header">
+                            <span class="autodesc-label">Auto-opis połowu</span>
+                            <div class="toggle-switch" id="autoDescToggle" onclick="toggleAutoDesc()">
+                                <div class="toggle-knob"></div>
+                            </div>
+                        </div>
+                        <div class="autodesc-preview" id="autoDescPreview">
+                            <span class="preview-text">Karp, 4,1 kg, 58 cm. Jezioro Mielnickie, 21 lut 2026. Kukurydza. #wędkarstwo #karp #siedzi</span>
+                        </div>
+                    </div>
+
+                    <div class="share-apps-label">Wyślij do</div>
+                    <div class="share-apps-row">
+                        <div class="share-app">
+                            <div class="share-app-icon app-instagram">
+                                <span class="material-icons-outlined">photo_camera</span>
+                            </div>
+                            <span class="share-app-label">Instagram</span>
+                        </div>
+                        <div class="share-app">
+                            <div class="share-app-icon app-facebook">
+                                <span class="material-icons-outlined">thumb_up</span>
+                            </div>
+                            <span class="share-app-label">Facebook</span>
+                        </div>
+                        <div class="share-app">
+                            <div class="share-app-icon app-whatsapp">
+                                <span class="material-icons-outlined">chat</span>
+                            </div>
+                            <span class="share-app-label">WhatsApp</span>
+                        </div>
+                        <div class="share-app">
+                            <div class="share-app-icon app-messenger">
+                                <span class="material-icons-outlined">forum</span>
+                            </div>
+                            <span class="share-app-label">Messenger</span>
+                        </div>
+                        <div class="share-app">
+                            <div class="share-app-icon app-copy">
+                                <span class="material-icons-outlined">link</span>
+                            </div>
+                            <span class="share-app-label">Kopiuj</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Session Banner -->
+            <div class="session-banner">
+                <div class="banner-dot"></div>
+                <span class="banner-text"><strong>Sesja aktywna</strong> · 3h 42min</span>
+                <div class="banner-arrow">
+                    <span class="material-icons-outlined">chevron_right</span>
+                </div>
+            </div>
+
+            <div class="nav-bar">
+                <div class="nav-pill"></div>
+            </div>
+        </div>
+        <p class="phone-meta">390×844 · Ekran 20 · Karuzela + Udostępnianie</p>
+    </div>
+    <script>
+        var currentState = 'karuzela';
+        var autoDescOn = true;
+
+        function setState(s) {
+            currentState = s;
+            var overlay = document.getElementById('shareOverlay');
+            var btnK = document.getElementById('btnKaruzela');
+            var btnS = document.getElementById('btnShare');
+            if (s === 'share') {
+                overlay.style.display = 'flex';
+                btnK.classList.remove('active');
+                btnS.classList.add('active');
+            } else {
+                overlay.style.display = 'none';
+                btnK.classList.add('active');
+                btnS.classList.remove('active');
+            }
+        }
+
+        function overlayClose(e) {
+            setState('karuzela');
+        }
+
+        function toggleAutoDesc() {
+            autoDescOn = !autoDescOn;
+            var toggle = document.getElementById('autoDescToggle');
+            var preview = document.getElementById('autoDescPreview');
+            if (autoDescOn) {
+                toggle.classList.remove('off');
+                preview.style.display = 'block';
+            } else {
+                toggle.classList.add('off');
+                preview.style.display = 'none';
+            }
+        }
+
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 90;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+</body>
+
+</html>

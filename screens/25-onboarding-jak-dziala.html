@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 25 Onboarding: Jak działa aplikacja?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { overflow: hidden; height: 100%; }
+
+        body {
+            background: #04080c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .state-btns {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .state-btn {
+            padding: 4px 14px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #222;
+            color: #666;
+            background: transparent;
+        }
+        .state-btn.active.s1 { background: rgba(5,150,105,.15);  color: #34d399; border-color: #34d399; }
+        .state-btn.active.s2 { background: rgba(14,116,144,.15); color: #22d3ee; border-color: #22d3ee; }
+        .state-btn.active.s3 { background: rgba(217,119,6,.15);  color: #fbbf24; border-color: #fbbf24; }
+        .state-btn.active.s4 { background: rgba(124,58,237,.15); color: #a78bfa; border-color: #a78bfa; }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+
+        .phone {
+            width: 390px;
+            height: 844px;
+            border-radius: 52px;
+            box-shadow: 0 0 0 2px #151b25, 0 0 0 5px #0a1018,
+                        0 30px 80px rgba(0,0,0,.92);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: #060c10;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute; right: -3px; top: 140px;
+            width: 3px; height: 60px;
+            background: #151b25; border-radius: 0 3px 3px 0;
+        }
+        .phone::after {
+            content: '';
+            position: absolute; left: -3px; top: 120px;
+            width: 3px; height: 36px;
+            background: #151b25; border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #151b25, 0 86px 0 #151b25;
+        }
+
+        .dynamic-island {
+            position: absolute; top: 12px; left: 50%;
+            transform: translateX(-50%);
+            width: 120px; height: 34px;
+            background: #000; border-radius: 20px; z-index: 30;
+        }
+
+        /* Status bar */
+        .status-bar {
+            height: 44px; padding: 14px 24px 0;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0; z-index: 10; position: relative;
+        }
+        .status-bar .time { font-size: 14px; font-weight: 600; color: rgba(255,255,255,.75); }
+        .status-icons { display: flex; gap: 6px; align-items: center; }
+        .status-icons svg { fill: rgba(255,255,255,.65); }
+
+        /* ======= SLIDE SYSTEM ======= */
+        .slides-wrap { flex: 1; position: relative; display: flex; flex-direction: column; min-height: 0; }
+
+        .slide { display: none; flex: 1; flex-direction: column; min-height: 0; }
+        .slide.active { display: flex; }
+
+        /* ---- ILLUSTRATION AREA ---- */
+        .illus {
+            flex-shrink: 0;
+            height: 330px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Slide-specific background gradients */
+        .illus.ig {
+            background:
+                radial-gradient(ellipse at 50% 50%, rgba(5,150,105,.3) 0%, rgba(5,150,105,.08) 55%, transparent 80%),
+                #050f08;
+        }
+        .illus.it {
+            background:
+                radial-gradient(ellipse at 50% 50%, rgba(14,116,144,.32) 0%, rgba(14,116,144,.08) 55%, transparent 80%),
+                #050b0f;
+        }
+        .illus.ia {
+            background:
+                radial-gradient(ellipse at 50% 50%, rgba(217,119,6,.28) 0%, rgba(217,119,6,.07) 55%, transparent 80%),
+                #0f0900;
+        }
+        .illus.ip {
+            background:
+                radial-gradient(ellipse at 50% 50%, rgba(124,58,237,.3) 0%, rgba(124,58,237,.07) 55%, transparent 80%),
+                #07050f;
+        }
+
+        /* Section badge */
+        .illus-badge {
+            position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+            padding: 4px 14px; border-radius: 20px;
+            font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .bg { background: rgba(5,150,105,.2);  border: 1px solid rgba(52,211,153,.3); color: #34d399; }
+        .bt { background: rgba(14,116,144,.2); border: 1px solid rgba(34,211,238,.3); color: #22d3ee; }
+        .ba { background: rgba(217,119,6,.2);  border: 1px solid rgba(251,191,36,.3); color: #fbbf24; }
+        .bp { background: rgba(124,58,237,.2); border: 1px solid rgba(167,139,250,.3); color: #a78bfa; }
+
+        /* Slide counter */
+        .slide-counter {
+            position: absolute; top: 14px; right: 20px;
+            font-size: 11px; font-weight: 600; color: rgba(255,255,255,.3);
+        }
+
+        /* Central visual wrapper */
+        .illus-center { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+        /* ---- CONTENT AREA ---- */
+        .slide-content {
+            flex: 1;
+            display: flex; flex-direction: column;
+            padding: 20px 24px 0;
+            min-height: 0;
+        }
+
+        .slide-icon-row {
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 10px;
+        }
+
+        .si-box {
+            width: 48px; height: 48px; border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .si-box .material-icons-outlined { font-size: 26px; width: 26px; height: 26px; line-height: 26px; overflow: hidden; }
+
+        .si-g { background: rgba(5,150,105,.25); }
+        .si-g .material-icons-outlined { color: #34d399; }
+        .si-t { background: rgba(14,116,144,.3); }
+        .si-t .material-icons-outlined { color: #22d3ee; }
+        .si-a { background: rgba(217,119,6,.22); }
+        .si-a .material-icons-outlined { color: #fbbf24; }
+        .si-p { background: rgba(124,58,237,.25); }
+        .si-p .material-icons-outlined { color: #a78bfa; }
+
+        .slide-title {
+            font-size: 19px; font-weight: 700;
+            color: rgba(255,255,255,.95); line-height: 1.2; flex: 1;
+        }
+
+        .slide-desc {
+            font-size: 13px; color: rgba(255,255,255,.6);
+            line-height: 1.6; flex: 1;
+        }
+
+        /* Step dots */
+        .step-dots {
+            display: flex; gap: 6px; align-items: center; justify-content: center;
+            margin-top: 14px;
+        }
+        .sd { height: 8px; border-radius: 4px; background: rgba(255,255,255,.15); width: 8px; }
+        .sd.ag { width: 24px; background: #34d399; }
+        .sd.at { width: 24px; background: #22d3ee; }
+        .sd.aa { width: 24px; background: #fbbf24; }
+        .sd.ap { width: 24px; background: #a78bfa; }
+        .sd.done { background: rgba(255,255,255,.3); }
+
+        /* ---- CTA ---- */
+        .cta-area {
+            padding: 12px 20px 16px;
+            display: flex; flex-direction: column;
+            align-items: stretch; gap: 8px; flex-shrink: 0;
+        }
+
+        .nav-row { display: flex; gap: 10px; }
+
+        .nav-back {
+            height: 52px; padding: 0 20px; border-radius: 16px;
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.1);
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer;
+            font-size: 14px; font-weight: 600; color: rgba(255,255,255,.5);
+        }
+        .nav-back .material-icons-outlined { font-size: 18px; color: rgba(255,255,255,.35); }
+
+        .nav-next {
+            flex: 1; height: 52px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            cursor: pointer; font-size: 15px; font-weight: 700; color: #fff;
+        }
+        .nn-g { background: linear-gradient(135deg, #065f46, #059669); border: 1px solid rgba(52,211,153,.3); }
+        .nn-t { background: linear-gradient(135deg, #0e7490, #0891b2); border: 1px solid rgba(34,211,238,.3); }
+        .nn-a { background: linear-gradient(135deg, #92400e, #b45309); border: 1px solid rgba(251,191,36,.25); }
+        .nn-p { background: linear-gradient(135deg, #5b21b6, #7c3aed); border: 1px solid rgba(167,139,250,.3);
+                box-shadow: 0 4px 20px rgba(124,58,237,.35); }
+        .nav-next .material-icons-outlined { font-size: 20px; }
+
+        .skip-link {
+            text-align: center; font-size: 12px;
+            color: rgba(255,255,255,.35); cursor: pointer;
+        }
+
+        .phone-meta { color: #2a3a4a; font-size: 11px; margin-top: 10px; letter-spacing: 1px; }
+    </style>
+</head>
+
+<body>
+    <p class="screen-label">SIEDZI! · Ekran 25 / 26 · Onboarding: Jak działa aplikacja?</p>
+    <div class="state-btns">
+        <button class="state-btn s1 active" onclick="setSlide(1)">1 · Planuj</button>
+        <button class="state-btn s2" onclick="setSlide(2)">2 · Sesja</button>
+        <button class="state-btn s3" onclick="setSlide(3)">3 · Branie!</button>
+        <button class="state-btn s4" onclick="setSlide(4)">4 · Historia</button>
+    </div>
+
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+            <div class="dynamic-island"></div>
+
+            <!-- Status bar -->
+            <div class="status-bar">
+                <span class="time">20:02</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12"><rect x="0" y="8" width="3" height="4" rx="0.5"/><rect x="4" y="5" width="3" height="7" rx="0.5"/><rect x="8" y="2" width="3" height="10" rx="0.5"/><rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35"/></svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z"/><path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="rgba(255,255,255,.65)" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="rgba(255,255,255,.65)" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.65)" stroke-width="1.2" fill="none"/><rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="rgba(255,255,255,.5)" opacity="0.6"/><rect x="1.5" y="2.5" width="11" height="7" rx="1.2" fill="rgba(255,255,255,.65)"/></svg>
+                </div>
+            </div>
+
+            <div class="slides-wrap">
+
+                <!-- ===== SLIDE 1: PLANOWANIE ===== -->
+                <div class="slide active" id="slide-1">
+                    <div class="illus ig">
+                        <div class="illus-badge bg">Planowanie wyprawy</div>
+                        <span class="slide-counter">1 / 4</span>
+
+                        <!-- Single centered visual: Solunar + weather card -->
+                        <svg width="320" height="210" viewBox="0 0 320 210" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Main card -->
+                            <rect x="0" y="0" width="320" height="210" rx="22" fill="rgba(5,150,105,.12)" stroke="rgba(52,211,153,.2)" stroke-width="1.5"/>
+
+                            <!-- Weather row -->
+                            <circle cx="52" cy="52" r="24" fill="none" stroke="rgba(251,191,36,.5)" stroke-width="2"/>
+                            <circle cx="52" cy="52" r="11" fill="rgba(251,191,36,.55)"/>
+                            <!-- Sun rays -->
+                            <line x1="52" y1="20" x2="52" y2="14" stroke="rgba(251,191,36,.5)" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="52" y1="84" x2="52" y2="90" stroke="rgba(251,191,36,.5)" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="20" y1="52" x2="14" y2="52" stroke="rgba(251,191,36,.5)" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="84" y1="52" x2="90" y2="52" stroke="rgba(251,191,36,.5)" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="30" y1="30" x2="26" y2="26" stroke="rgba(251,191,36,.4)" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="74" y1="30" x2="78" y2="26" stroke="rgba(251,191,36,.4)" stroke-width="2" stroke-linecap="round"/>
+
+                            <text x="90" y="44" font-family="Roboto" font-weight="700" font-size="30" fill="rgba(255,255,255,.92)">22°C</text>
+                            <text x="90" y="65" font-family="Roboto" font-size="13" fill="rgba(255,255,255,.5)">Piątek, 14 marca</text>
+                            <text x="90" y="82" font-family="Roboto" font-weight="500" font-size="12" fill="#34d399">↑ Ciśnienie rośnie</text>
+
+                            <!-- Divider -->
+                            <line x1="22" y1="104" x2="298" y2="104" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+
+                            <!-- Solunar label -->
+                            <text x="22" y="125" font-family="Roboto" font-weight="500" font-size="11" fill="rgba(255,255,255,.45)" letter-spacing="1.5">OKNA SOLUNARNE</text>
+
+                            <!-- Solunar blocks – just 2, large and clear -->
+                            <rect x="22" y="136" width="128" height="50" rx="14" fill="rgba(52,211,153,.15)" stroke="rgba(52,211,153,.45)" stroke-width="1.5"/>
+                            <text x="86" y="157" text-anchor="middle" font-family="Roboto" font-weight="700" font-size="13" fill="#34d399">MAJOR</text>
+                            <text x="86" y="174" text-anchor="middle" font-family="Roboto" font-size="12" fill="rgba(52,211,153,.85)">06:15 – 07:45</text>
+
+                            <rect x="168" y="136" width="130" height="50" rx="14" fill="rgba(52,211,153,.15)" stroke="rgba(52,211,153,.45)" stroke-width="1.5"/>
+                            <text x="233" y="157" text-anchor="middle" font-family="Roboto" font-weight="700" font-size="13" fill="#34d399">MAJOR</text>
+                            <text x="233" y="174" text-anchor="middle" font-family="Roboto" font-size="12" fill="rgba(52,211,153,.85)">18:45 – 20:15</text>
+
+                            <!-- Star insight -->
+                            <text x="160" y="200" text-anchor="middle" font-family="Roboto" font-weight="600" font-size="12" fill="rgba(251,191,36,.8)">★  Gwiazdy wróżą dobry wyjazd</text>
+                        </svg>
+                    </div>
+
+                    <div class="slide-content">
+                        <div class="slide-icon-row">
+                            <div class="si-box si-g"><span class="material-icons-outlined">wb_sunny</span></div>
+                            <div class="slide-title">Zaplanuj z wyprzedzeniem</div>
+                        </div>
+                        <div class="slide-desc">
+                            Prognoza pogody, ciśnienie i solunar na wybrany dzień wyjazdu. Wyjeżdżaj kiedy gwiazdy i historia mówią „bierze".
+                        </div>
+                        <div class="step-dots">
+                            <div class="sd ag"></div>
+                            <div class="sd"></div>
+                            <div class="sd"></div>
+                            <div class="sd"></div>
+                        </div>
+                    </div>
+
+                    <div class="cta-area">
+                        <div class="nav-row">
+                            <div class="nav-next nn-g" onclick="setSlide(2)">
+                                Dalej <span class="material-icons-outlined">arrow_forward</span>
+                            </div>
+                        </div>
+                        <div class="skip-link" onclick="setSlide(4)">Pomiń wprowadzenie</div>
+                    </div>
+                </div>
+
+                <!-- ===== SLIDE 2: SESJA ===== -->
+                <div class="slide" id="slide-2">
+                    <div class="illus it">
+                        <div class="illus-badge bt">Aktywna sesja</div>
+                        <span class="slide-counter">2 / 4</span>
+
+                        <!-- Single centered visual: mini timeline -->
+                        <svg width="310" height="220" viewBox="0 0 310 220" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Timeline vertical line -->
+                            <line x1="34" y1="20" x2="34" y2="200" stroke="rgba(34,211,238,.2)" stroke-width="2" stroke-dasharray="4 4"/>
+
+                            <!-- Entry 1: Rzut -->
+                            <circle cx="34" cy="30" r="11" fill="rgba(14,116,144,.35)" stroke="rgba(34,211,238,.6)" stroke-width="2"/>
+                            <text x="34" y="35" text-anchor="middle" font-family="Roboto" font-size="11" fill="#22d3ee">1</text>
+                            <rect x="58" y="16" width="240" height="30" rx="10" fill="rgba(14,116,144,.14)" stroke="rgba(34,211,238,.2)" stroke-width="1"/>
+                            <text x="74" y="28" font-family="Roboto" font-weight="600" font-size="12" fill="rgba(255,255,255,.85)">Rzut 1 — 06:30</text>
+                            <text x="74" y="42" font-family="Roboto" font-size="10" fill="rgba(255,255,255,.45)">Boile Truskawka · Shimano 3.5 lb</text>
+
+                            <!-- Entry 2: Branie -->
+                            <circle cx="34" cy="96" r="13" fill="rgba(52,211,153,.22)" stroke="rgba(52,211,153,.7)" stroke-width="2.5"/>
+                            <text x="34" y="101" text-anchor="middle" font-family="Roboto" font-weight="700" font-size="13" fill="#34d399">✓</text>
+                            <rect x="58" y="80" width="240" height="36" rx="12" fill="rgba(5,150,105,.18)" stroke="rgba(52,211,153,.35)" stroke-width="1.5"/>
+                            <text x="74" y="95" font-family="Roboto" font-weight="700" font-size="13" fill="#34d399">Branie! — Karp</text>
+                            <text x="74" y="111" font-family="Roboto" font-size="11" fill="rgba(52,211,153,.8)">4,8 kg · 68 cm · godz. 08:15</text>
+
+                            <!-- Entry 3: Zmiana zestawu -->
+                            <circle cx="34" cy="160" r="11" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
+                            <text x="34" y="165" text-anchor="middle" font-family="Roboto" font-size="13" fill="rgba(255,255,255,.45)">⇄</text>
+                            <rect x="58" y="146" width="240" height="30" rx="10" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+                            <text x="74" y="159" font-family="Roboto" font-weight="500" font-size="12" fill="rgba(255,255,255,.65)">Zmiana zestawu — 10:00</text>
+                            <text x="74" y="173" font-family="Roboto" font-size="10" fill="rgba(255,255,255,.35)">Pellet 6mm zamiast boile</text>
+
+                            <!-- Stats row bottom -->
+                            <rect x="58" y="196" width="110" height="22" rx="8" fill="rgba(14,116,144,.15)" stroke="rgba(34,211,238,.2)" stroke-width="1"/>
+                            <text x="113" y="211" text-anchor="middle" font-family="Roboto" font-weight="600" font-size="10" fill="#22d3ee">4 rzuty</text>
+                            <rect x="178" y="196" width="120" height="22" rx="8" fill="rgba(14,116,144,.15)" stroke="rgba(34,211,238,.2)" stroke-width="1"/>
+                            <text x="238" y="211" text-anchor="middle" font-family="Roboto" font-weight="600" font-size="10" fill="#22d3ee">2h 15min sesji</text>
+                        </svg>
+                    </div>
+
+                    <div class="slide-content">
+                        <div class="slide-icon-row">
+                            <div class="si-box si-t"><span class="material-icons-outlined">linear_scale</span></div>
+                            <div class="slide-title">Każdy rzut ma swoje miejsce</div>
+                        </div>
+                        <div class="slide-desc">
+                            Oś czasu sesji zapisuje każdy rzut, zmianę sprzętu i branie. Pełna historia wyjazdu bez notatek.
+                        </div>
+                        <div class="step-dots">
+                            <div class="sd done"></div>
+                            <div class="sd at"></div>
+                            <div class="sd"></div>
+                            <div class="sd"></div>
+                        </div>
+                    </div>
+
+                    <div class="cta-area">
+                        <div class="nav-row">
+                            <div class="nav-back" onclick="setSlide(1)">
+                                <span class="material-icons-outlined">arrow_back</span> Wstecz
+                            </div>
+                            <div class="nav-next nn-t" onclick="setSlide(3)">
+                                Dalej <span class="material-icons-outlined">arrow_forward</span>
+                            </div>
+                        </div>
+                        <div class="skip-link" onclick="setSlide(4)">Pomiń wprowadzenie</div>
+                    </div>
+                </div>
+
+                <!-- ===== SLIDE 3: BRANIE! ===== -->
+                <div class="slide" id="slide-3">
+                    <div class="illus ia">
+                        <div class="illus-badge ba">Rejestracja połowu</div>
+                        <span class="slide-counter">3 / 4</span>
+
+                        <!-- Single centered visual: 3 numbered steps -->
+                        <svg width="300" height="220" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Connecting line -->
+                            <line x1="38" y1="38" x2="38" y2="182" stroke="rgba(251,191,36,.18)" stroke-width="2" stroke-dasharray="4 4"/>
+
+                            <!-- Step 1: Zdjęcie ✓ -->
+                            <circle cx="38" cy="38" r="22" fill="rgba(52,211,153,.2)" stroke="rgba(52,211,153,.6)" stroke-width="2"/>
+                            <text x="38" y="44" text-anchor="middle" font-family="Roboto" font-weight="700" font-size="18" fill="#34d399">✓</text>
+                            <text x="76" y="32" font-family="Roboto" font-weight="700" font-size="15" fill="rgba(255,255,255,.9)">Zdjęcie ryby</text>
+                            <text x="76" y="50" font-family="Roboto" font-size="12" fill="rgba(255,255,255,.5)">Jeden klik — kamera otwiera się sama</text>
+
+                            <!-- Step 2: Gatunek / waga ✓ -->
+                            <circle cx="38" cy="110" r="22" fill="rgba(251,191,36,.2)" stroke="rgba(251,191,36,.6)" stroke-width="2"/>
+                            <text x="38" y="116" text-anchor="middle" font-family="Roboto" font-weight="700" font-size="18" fill="#fbbf24">✓</text>
+                            <text x="76" y="104" font-family="Roboto" font-weight="700" font-size="15" fill="rgba(255,255,255,.9)">Gatunek i waga</text>
+                            <text x="76" y="122" font-family="Roboto" font-size="12" fill="rgba(255,255,255,.5)">Karp · 4,8 kg · 68 cm · „Wielka Berta"</text>
+
+                            <!-- Step 3: Zapisz -->
+                            <circle cx="38" cy="182" r="22" fill="rgba(14,116,144,.25)" stroke="rgba(34,211,238,.65)" stroke-width="2"/>
+                            <text x="38" y="189" text-anchor="middle" font-family="Roboto" font-size="22" fill="#22d3ee">→</text>
+                            <text x="76" y="176" font-family="Roboto" font-weight="700" font-size="15" fill="#22d3ee">Zapisz połów</text>
+                            <text x="76" y="194" font-family="Roboto" font-size="12" fill="rgba(34,211,238,.7)">GPS · pogoda · solunar · zestaw — auto</text>
+
+                            <!-- "= 3 sekundy" badge centered at bottom -->
+                            <rect x="75" y="210" width="150" height="10" rx="5"/>
+                        </svg>
+
+                        <!-- "= 3 sek" pill absolutely centered at bottom of illus -->
+                        <div style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); white-space:nowrap; background:rgba(251,191,36,.12); border:1.5px solid rgba(251,191,36,.35); border-radius:20px; padding:6px 20px; font-size:13px; font-weight:700; color:#fbbf24; letter-spacing:0.5px;">
+                            = 3 sekundy
+                        </div>
+                    </div>
+
+                    <div class="slide-content">
+                        <div class="slide-icon-row">
+                            <div class="si-box si-a"><span class="material-icons-outlined">bolt</span></div>
+                            <div class="slide-title">Połów w 3 sekundy</div>
+                        </div>
+                        <div class="slide-desc">
+                            Zdjęcie → gatunek i waga → Zapisz. GPS, czas, pogoda i cały zestaw wędki dodają się automatycznie. Zero ręcznego wpisywania.
+                        </div>
+                        <div class="step-dots">
+                            <div class="sd done"></div>
+                            <div class="sd done"></div>
+                            <div class="sd aa"></div>
+                            <div class="sd"></div>
+                        </div>
+                    </div>
+
+                    <div class="cta-area">
+                        <div class="nav-row">
+                            <div class="nav-back" onclick="setSlide(2)">
+                                <span class="material-icons-outlined">arrow_back</span> Wstecz
+                            </div>
+                            <div class="nav-next nn-a" onclick="setSlide(4)">
+                                Dalej <span class="material-icons-outlined">arrow_forward</span>
+                            </div>
+                        </div>
+                        <div class="skip-link" onclick="setSlide(4)">Pomiń wprowadzenie</div>
+                    </div>
+                </div>
+
+                <!-- ===== SLIDE 4: HISTORIA & GALERIA ===== -->
+                <div class="slide" id="slide-4">
+                    <div class="illus ip">
+                        <div class="illus-badge bp">Historia i Galeria</div>
+                        <span class="slide-counter">4 / 4</span>
+
+                        <!-- Single centered visual: session card + gallery row -->
+                        <svg width="310" height="215" viewBox="0 0 310 215" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Session card -->
+                            <rect x="0" y="0" width="310" height="100" rx="18" fill="rgba(124,58,237,.14)" stroke="rgba(167,139,250,.22)" stroke-width="1.5"/>
+                            <text x="20" y="26" font-family="Roboto" font-weight="700" font-size="14" fill="rgba(255,255,255,.9)">Jezioro Przykładowe</text>
+                            <text x="20" y="44" font-family="Roboto" font-size="11" fill="rgba(255,255,255,.45)">14 marca 2026 · 4h 22min</text>
+                            <!-- Fish chips -->
+                            <rect x="20" y="54" width="70" height="20" rx="7" fill="rgba(124,58,237,.25)" stroke="rgba(167,139,250,.3)" stroke-width="1"/>
+                            <text x="55" y="68" text-anchor="middle" font-family="Roboto" font-weight="600" font-size="10" fill="#a78bfa">Karp ×3</text>
+                            <rect x="100" y="54" width="72" height="20" rx="7" fill="rgba(124,58,237,.18)" stroke="rgba(167,139,250,.2)" stroke-width="1"/>
+                            <text x="136" y="68" text-anchor="middle" font-family="Roboto" font-size="10" fill="rgba(167,139,250,.8)">Okoń ×2</text>
+                            <!-- Weight -->
+                            <text x="218" y="60" font-family="Roboto" font-weight="700" font-size="26" fill="rgba(255,255,255,.9)">14,3</text>
+                            <text x="218" y="78" font-family="Roboto" font-size="11" fill="rgba(167,139,250,.6)">kg łącznie</text>
+                            <text x="218" y="94" font-family="Roboto" font-weight="600" font-size="10" fill="rgba(251,191,36,.7)">★ Najlepsza sesja</text>
+
+                            <!-- Gallery thumbs row — 4 photos -->
+                            <text x="0" y="126" font-family="Roboto" font-weight="500" font-size="10" fill="rgba(255,255,255,.4)" letter-spacing="1">GALERIA PRYWATNA</text>
+                            <rect x="0" y="134" width="68" height="68" rx="12" fill="rgba(180,130,60,.3)"/>
+                            <text x="34" y="174" text-anchor="middle" font-family="Roboto" font-size="28">🐟</text>
+                            <rect x="78" y="134" width="68" height="68" rx="12" fill="rgba(20,60,130,.45)"/>
+                            <text x="112" y="174" text-anchor="middle" font-family="Roboto" font-size="28">🎣</text>
+                            <rect x="156" y="134" width="68" height="68" rx="12" fill="rgba(40,90,40,.4)"/>
+                            <text x="190" y="174" text-anchor="middle" font-family="Roboto" font-size="28">🌿</text>
+                            <!-- 4th: +N overflow -->
+                            <rect x="234" y="134" width="68" height="68" rx="12" fill="rgba(80,40,120,.4)"/>
+                            <rect x="234" y="134" width="68" height="68" rx="12" fill="rgba(0,0,0,.38)"/>
+                            <text x="268" y="164" text-anchor="middle" font-family="Roboto" font-weight="700" font-size="18" fill="rgba(255,255,255,.85)">+12</text>
+                            <text x="268" y="182" text-anchor="middle" font-family="Roboto" font-size="10" fill="rgba(255,255,255,.55)">zdjęć</text>
+
+                            <!-- Share hint -->
+                            <rect x="0" y="210" width="310" height="5" rx="2.5" fill="rgba(124,58,237,.15)"/>
+                        </svg>
+
+                        <!-- Share pill -->
+                        <div style="position:absolute; bottom:18px; left:50%; transform:translateX(-50%); white-space:nowrap; background:rgba(124,58,237,.15); border:1px solid rgba(167,139,250,.3); border-radius:20px; padding:6px 18px; display:flex; align-items:center; gap:7px;">
+                            <span class="material-icons-outlined" style="font-size:14px;color:#a78bfa;">share</span>
+                            <span style="font-size:12px;font-weight:600;color:#a78bfa;">Udostępnij z auto-opisem</span>
+                        </div>
+                    </div>
+
+                    <div class="slide-content">
+                        <div class="slide-icon-row">
+                            <div class="si-box si-p"><span class="material-icons-outlined">auto_stories</span></div>
+                            <div class="slide-title">Twoja historia połowów</div>
+                        </div>
+                        <div class="slide-desc">
+                            Sesje, galeria i statystyki zawsze pod ręką. Udostępniaj zdjęcia z gotowym opisem na Instagram. Backup na Google Drive.
+                        </div>
+                        <div class="step-dots">
+                            <div class="sd done"></div>
+                            <div class="sd done"></div>
+                            <div class="sd done"></div>
+                            <div class="sd ap"></div>
+                        </div>
+                    </div>
+
+                    <div class="cta-area">
+                        <div class="nav-row">
+                            <div class="nav-back" onclick="setSlide(3)">
+                                <span class="material-icons-outlined">arrow_back</span> Wstecz
+                            </div>
+                            <div class="nav-next nn-p">
+                                <span class="material-icons-outlined">check_circle_outline</span>
+                                Rozumiem!
+                            </div>
+                        </div>
+                        <div class="skip-link">Pomiń — przejdź do aplikacji</div>
+                    </div>
+                </div>
+
+            </div><!-- end slides-wrap -->
+        </div>
+        <p class="phone-meta">390×844 · Ekran 25 · Onboarding: Jak działa aplikacja?</p>
+    </div>
+
+    <script>
+        function setSlide(n) {
+            for (var i = 1; i <= 4; i++) {
+                document.getElementById('slide-' + i).classList.toggle('active', i === n);
+            }
+            document.querySelectorAll('.state-btn').forEach(function(b, i) {
+                b.classList.toggle('active', i + 1 === n);
+            });
+        }
+
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 90;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / 870, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Gradle
+.gradle/
+build/
+
+# Local config
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Keystore
+*.jks
+*.keystore
+
+# Crashlytics
+crashlytics.properties
+
+# NDK
+obj/
+
+# Kotlin
+*.kotlin_module

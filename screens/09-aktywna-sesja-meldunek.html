@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 09 Aktywna Sesja: Meldunek na Stanowisku</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap"
+        rel="stylesheet" />
+    <script src="weather-icons.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            overflow: hidden;
+            height: 100%
+        }
+
+        body {
+            background: #060f0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center
+        }
+
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #080f0a;
+            border-radius: 52px;
+            box-shadow: 0 0 0 2px #2a2e2a, 0 0 0 5px #1a1e1a,
+                0 30px 80px rgba(0, 0, 0, .85), inset 0 0 0 1px #2e3530;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 140px;
+            width: 3px;
+            height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px;
+            top: 120px;
+            width: 3px;
+            height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20
+        }
+
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+            background: #080f0a
+        }
+
+        .status-bar .time {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center
+        }
+
+        .status-icons svg {
+            fill: #e0e0e0
+        }
+
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none
+        }
+
+        .screen-body::-webkit-scrollbar {
+            display: none
+        }
+
+        /* ── MAP HERO ──────────────────────────────────────────── */
+        .map-hero {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+
+        .map-hero-svg {
+            width: 100%;
+            height: 100%;
+            display: block
+        }
+
+        /* Top gradient overlay */
+        .map-top-fade {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to bottom, #080f0a, transparent);
+        }
+
+        /* Bottom gradient overlay */
+        .map-bottom-fade {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to top, #080f0a, transparent);
+        }
+
+        /* status bar on top of map */
+        .map-status {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* GPS Locating pill */
+        .gps-pill {
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(8, 15, 10, .8);
+            border: 1px solid rgba(52, 211, 153, .4);
+            border-radius: 20px;
+            padding: 6px 14px;
+            backdrop-filter: blur(8px);
+            font-size: 12px;
+            font-weight: 500;
+            color: #34d399;
+            white-space: nowrap;
+            z-index: 15;
+        }
+
+        .gps-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #34d399;
+            animation: gpsBlink 1s ease-in-out infinite;
+        }
+
+        @keyframes gpsBlink {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: .4;
+                transform: scale(1.4)
+            }
+        }
+
+        /* GPS accuracy ring on map */
+        @keyframes ringExpand {
+            0% {
+                r: 18;
+                opacity: .6;
+                stroke-width: 2
+            }
+
+            100% {
+                r: 38;
+                opacity: 0;
+                stroke-width: 0.5
+            }
+        }
+
+        .acc-ring {
+            animation: ringExpand 2s ease-out infinite
+        }
+
+        .acc-ring2 {
+            animation: ringExpand 2s ease-out 0.7s infinite
+        }
+
+        /* ── BOTTOM SHEET (slides up over map) ───────────────── */
+        .bottom-sheet {
+            background: #080f0a;
+            border-radius: 24px 24px 0 0;
+            margin-top: -24px;
+            position: relative;
+            z-index: 5;
+            flex: 1;
+        }
+
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, .15);
+            margin: 10px auto 16px;
+        }
+
+        /* Fishery confirmed card */
+        .fishery-card {
+            margin: 0 16px 14px;
+            background: rgba(52, 211, 153, .07);
+            border: 1px solid rgba(52, 211, 153, .22);
+            border-radius: 18px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .fishery-icon-box {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: rgba(52, 211, 153, .12);
+            border: 1px solid rgba(52, 211, 153, .25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .fishery-info {
+            flex: 1
+        }
+
+        .fishery-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px
+        }
+
+        .fishery-addr {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .45)
+        }
+
+        .fishery-check {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(52, 211, 153, .2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* GPS accuracy bar */
+        .gps-accuracy {
+            margin: 0 16px 14px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 16px;
+            padding: 12px 14px;
+        }
+
+        .gps-acc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .gps-acc-label {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .35)
+        }
+
+        .gps-acc-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: #34d399
+        }
+
+        .gps-bar-track {
+            height: 6px;
+            background: rgba(255, 255, 255, .08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .gps-bar-fill {
+            height: 100%;
+            width: 88%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #059669, #34d399);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gps-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .3), transparent);
+            animation: shine 1.8s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            to {
+                left: 200%
+            }
+        }
+
+        .gps-coords {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .gps-coord-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, .35);
+            font-family: monospace;
+        }
+
+        .gps-coord-item span {
+            color: rgba(255, 255, 255, .6)
+        }
+
+        /* Stanowisko / Spot selector */
+        .sect-label {
+            padding: 0 16px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .3)
+        }
+
+        .spot-row {
+            margin: 0 16px 14px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .spot-card {
+            flex: 1;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 16px;
+            padding: 12px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .spot-card.active {
+            background: rgba(52, 211, 153, .08);
+            border-color: rgba(52, 211, 153, .3);
+        }
+
+        .spot-icon {
+            font-size: 18px
+        }
+
+        .spot-name {
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, .6);
+            text-align: center
+        }
+
+        .spot-card.active .spot-name {
+            color: #34d399
+        }
+
+        .spot-check {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(52, 211, 153, .2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Current conditions mini strip */
+        .conditions-strip {
+            margin: 0 16px 14px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 16px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .cond-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .cond-item+.cond-item {
+            border-left: 1px solid rgba(255, 255, 255, .07);
+            padding-left: 14px
+        }
+
+        .cond-val {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff
+        }
+
+        .cond-sub {
+            font-size: 10px;
+            color: rgba(255, 255, 255, .35);
+            margin-top: 1px
+        }
+
+        /* Start btn */
+        .cta-wrap {
+            padding: 8px 16px 6px
+        }
+
+        .cta-btn {
+            background: linear-gradient(135deg, #059669, #047857);
+            border-radius: 16px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            box-shadow: 0 4px 24px rgba(5, 150, 105, .4), 0 0 0 1px rgba(52, 211, 153, .2);
+            transition: transform .15s;
+        }
+
+        .cta-btn:active {
+            transform: scale(.98)
+        }
+
+        .cta-left {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .session-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cta-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: .3px
+        }
+
+        .cta-sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .65);
+            margin-top: 1px
+        }
+
+        .cta-arrow {
+            font-size: 24px;
+            color: rgba(255, 255, 255, .8)
+        }
+
+        .nav-bar {
+            height: 34px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, .3)
+        }
+
+        .nav-pill {
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, .27);
+            border-radius: 2px
+        }
+
+        .phone-meta {
+            color: #444;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px
+        }
+    </style>
+</head>
+
+<body>
+    <p class="screen-label">SIEDZI! · Ekran 09 / 26 · Aktywna Sesja: Meldunek</p>
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+            <div class="dynamic-island"></div>
+
+            <!-- Status Bar (standard 02 - rezerwa 44px przed treścią) -->
+            <div class="status-bar">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="gps-dot"></div>
+                    <span class="time">10:38</span>
+                </div>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <rect x="0" y="8" width="3" height="4" rx="0.5" />
+                        <rect x="4" y="5" width="3" height="7" rx="0.5" />
+                        <rect x="8" y="2" width="3" height="10" rx="0.5" />
+                        <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35" />
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z" />
+                        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                            stroke-linecap="round" />
+                        <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                            stroke-linecap="round" />
+                    </svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12">
+                        <rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2" fill="none" />
+                        <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6" />
+                        <rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- ── MAP HERO ── -->
+            <div class="map-hero">
+
+                <!-- Topo map background -->
+                <svg class="map-hero-svg" viewBox="0 0 390 220" preserveAspectRatio="xMidYMid slice"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect width="390" height="220" fill="#0a1a0e" />
+                    <!-- Topo contours (water body = Jezioro Białe) -->
+                    <ellipse cx="195" cy="115" rx="120" ry="80" stroke="rgba(52,211,153,0.18)" stroke-width="1.2"
+                        fill="rgba(52,211,153,0.04)" />
+                    <ellipse cx="195" cy="115" rx="100" ry="64" stroke="rgba(52,211,153,0.15)" stroke-width="1"
+                        fill="rgba(52,211,153,0.05)" />
+                    <ellipse cx="195" cy="115" rx="80" ry="50" stroke="rgba(52,211,153,0.13)" stroke-width="1"
+                        fill="rgba(52,211,153,0.07)" />
+                    <ellipse cx="195" cy="115" rx="58" ry="36" stroke="rgba(52,211,153,0.1)" stroke-width="1"
+                        fill="rgba(52,211,153,0.1)" />
+                    <ellipse cx="195" cy="115" rx="38" ry="22" fill="rgba(52,211,153,0.16)" />
+                    <ellipse cx="195" cy="115" rx="20" ry="12" fill="rgba(52,211,153,0.25)" />
+                    <!-- Terrain lines -->
+                    <path d="M0,40 Q80,28 160,45 Q240,62 320,38 Q360,26 390,35" stroke="rgba(52,211,153,.09)"
+                        stroke-width="1" fill="none" />
+                    <path d="M0,60 Q70,48 140,65 Q210,82 290,55 Q350,38 390,52" stroke="rgba(52,211,153,.07)"
+                        stroke-width="1" fill="none" />
+                    <!-- Roads -->
+                    <path d="M0,160 Q60,155 120,165 L180,168 Q240,170 300,155 L390,145" stroke="rgba(255,255,255,.07)"
+                        stroke-width="2" fill="none" />
+                    <path d="M195,0 L195,80" stroke="rgba(255,255,255,.05)" stroke-width="1.5" fill="none"
+                        stroke-dasharray="4 4" />
+                    <!-- Trees / forest texture dots -->
+                    <circle cx="40" cy="90" r="4" fill="rgba(52,211,153,.08)" />
+                    <circle cx="55" cy="100" r="3" fill="rgba(52,211,153,.07)" />
+                    <circle cx="50" cy="78" r="3.5" fill="rgba(52,211,153,.06)" />
+                    <circle cx="330" cy="85" r="4" fill="rgba(52,211,153,.08)" />
+                    <circle cx="345" cy="70" r="3" fill="rgba(52,211,153,.07)" />
+                    <circle cx="320" cy="72" r="3.5" fill="rgba(52,211,153,.06)" />
+                    <!-- GPS accuracy rings (animated) -->
+                    <circle class="acc-ring" cx="240" cy="108" r="18" fill="none" stroke="rgba(52,211,153,0.5)"
+                        stroke-width="2" />
+                    <circle class="acc-ring2" cx="240" cy="108" r="26" fill="none" stroke="rgba(52,211,153,0.3)"
+                        stroke-width="1.5" />
+                    <!-- GPS pin -->
+                    <circle cx="240" cy="108" r="7" fill="#34d399" opacity="0.95" />
+                    <circle cx="240" cy="108" r="3.5" fill="#fff" />
+                    <!-- Pin shadow -->
+                    <ellipse cx="240" cy="116" rx="6" ry="2" fill="rgba(0,0,0,.3)" />
+                    <!-- Distance label -->
+                    <rect x="248" y="100" width="54" height="18" rx="5" fill="rgba(8,15,10,.85)"
+                        stroke="rgba(52,211,153,.4)" stroke-width="1" />
+                    <text x="275" y="112" text-anchor="middle" font-family="Roboto,sans-serif" font-size="9"
+                        font-weight="600" fill="#34d399">GPS: ±4m</text>
+                    <!-- Planned spot marker (different color) -->
+                    <rect x="135" y="95" width="60" height="16" rx="5" fill="rgba(8,15,10,.75)"
+                        stroke="rgba(251,191,36,.3)" stroke-width="1" />
+                    <circle cx="147" cy="103" r="4" fill="rgba(251,191,36,.7)" />
+                    <text x="172" y="107" text-anchor="middle" font-family="Roboto,sans-serif" font-size="8"
+                        fill="rgba(255,255,255,0.6)">Stanowisko A</text>
+                    <!-- North label -->
+                    <text x="20" y="30" font-family="Roboto,sans-serif" font-size="9" fill="rgba(255,255,255,.2)">N
+                        ↑</text>
+                    <!-- Scale bar -->
+                    <line x1="18" y1="195" x2="68" y2="195" stroke="rgba(255,255,255,.3)" stroke-width="1.5"
+                        stroke-linecap="round" />
+                    <line x1="18" y1="191" x2="18" y2="199" stroke="rgba(255,255,255,.3)" stroke-width="1.2" />
+                    <line x1="68" y1="191" x2="68" y2="199" stroke="rgba(255,255,255,.3)" stroke-width="1.2" />
+                    <text x="43" y="208" text-anchor="middle" font-family="Roboto,sans-serif" font-size="8"
+                        fill="rgba(255,255,255,.3)">100m</text>
+                </svg>
+
+                <div class="map-top-fade"></div>
+                <div class="map-bottom-fade"></div>
+
+                <!-- GPS locating pill (teraz poniżej status baru) -->
+                <div class="gps-pill">
+                    <div class="gps-dot"></div>
+                    Lokalizuję · Dokładność ±4 m
+                </div>
+
+            </div>
+            <!-- ── END MAP HERO ── -->
+
+            <!-- ── BOTTOM SHEET ── -->
+            <div class="bottom-sheet">
+                <div class="sheet-handle"></div>
+
+                <!-- Fishery confirmed -->
+                <div class="fishery-card">
+                    <div class="fishery-icon-box">
+                        <!-- Lake/topo icon -->
+                        <svg width="24" height="24" viewBox="0 0 30 30" fill="none">
+                            <ellipse cx="15" cy="16" rx="11" ry="8" stroke="#34d399" stroke-width="1.5"
+                                fill="rgba(52,211,153,.08)" />
+                            <ellipse cx="15" cy="16" rx="7" ry="5" stroke="#34d399" stroke-width="1"
+                                stroke-dasharray="2 2" fill="rgba(52,211,153,.12)" />
+                            <path d="M8,8 Q15,4 22,8" stroke="#34d399" stroke-width="1.2" fill="none"
+                                stroke-linecap="round" />
+                            <circle cx="15" cy="16" r="2" fill="#34d399" opacity="0.7" />
+                        </svg>
+                    </div>
+                    <div class="fishery-info">
+                        <div class="fishery-name">Jezioro Białe</div>
+                        <div class="fishery-addr">pow. giżycki · Mazury · Stanowisko A</div>
+                    </div>
+                    <div class="fishery-check">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M20 6L9 17l-5-5" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- GPS accuracy bar -->
+                <div class="gps-accuracy">
+                    <div class="gps-acc-header">
+                        <div class="gps-acc-label">Dokładność GPS</div>
+                        <div class="gps-acc-val">± 4 m · Doskonała</div>
+                    </div>
+                    <div class="gps-bar-track">
+                        <div class="gps-bar-fill"></div>
+                    </div>
+                    <div class="gps-coords">
+                        <div class="gps-coord-item">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                <line x1="12" y1="2" x2="12" y2="22" stroke="#34d399" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <line x1="2" y1="12" x2="22" y2="12" stroke="#34d399" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                            <span>53°52'14.6"N</span>
+                        </div>
+                        <div class="gps-coord-item">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                <line x1="12" y1="2" x2="12" y2="22" stroke="#34d399" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <line x1="2" y1="12" x2="22" y2="12" stroke="#34d399" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                            <span>21°34'08.2"E</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spot selector -->
+                <div class="sect-label">Wybierz Stanowisko</div>
+                <div class="spot-row">
+                    <div class="spot-card active">
+                        <div class="spot-icon">⚓</div>
+                        <div class="spot-name">Stanowisko A<br /><span style="font-size:9px;opacity:.6">przy
+                                pomoście</span></div>
+                        <div class="spot-check">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                <path d="M20 6L9 17l-5-5" stroke="#34d399" stroke-width="3" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="spot-card">
+                        <div class="spot-icon">🌿</div>
+                        <div class="spot-name">Stanowisko B<br /><span style="font-size:9px;opacity:.6">linia
+                                trzcin</span></div>
+                    </div>
+                    <div class="spot-card">
+                        <div class="spot-icon">➕</div>
+                        <div class="spot-name">Dodaj nowe<br /><span style="font-size:9px;opacity:.6">oznacz GPS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current conditions -->
+                <div class="sect-label">Warunki na Miejscu</div>
+                <div class="conditions-strip">
+                    <div class="cond-item">
+                        <div data-weather-icon="partly-cloudy-day" data-size="28"></div>
+                        <div>
+                            <div class="cond-val">6°C</div>
+                            <div class="cond-sub">Zmienne</div>
+                        </div>
+                    </div>
+                    <div class="cond-item">
+                        <svg width="22" height="22" viewBox="0 0 30 30" fill="none">
+                            <path d="M3 14c2.5-5 5.5-8 9-8s5.5 4 9 0" stroke="#94a3b8" stroke-width="2" fill="none"
+                                stroke-linecap="round" />
+                            <path d="M1 20c2.5-5 5-8 9-8s5 4 9 0" stroke="#94a3b8" stroke-width="1.5" fill="none"
+                                stroke-linecap="round" opacity="0.7" />
+                        </svg>
+                        <div>
+                            <div class="cond-val">9 km/h</div>
+                            <div class="cond-sub">NE · Wiatr</div>
+                        </div>
+                    </div>
+                    <div class="cond-item">
+                        <svg width="22" height="22" viewBox="0 0 30 30" fill="none">
+                            <rect x="3" y="10" width="20" height="14" rx="3" stroke="#94a3b8" stroke-width="1.8"
+                                fill="none" />
+                            <path d="M8 10 V7 Q8 4 11 4 Q14 4 14 7 V10" stroke="#94a3b8" stroke-width="1.8"
+                                stroke-linecap="round" fill="none" />
+                            <circle cx="13" cy="17" r="3" fill="#34d399" opacity="0.7" />
+                        </svg>
+                        <div>
+                            <div class="cond-val">1021 hPa</div>
+                            <div class="cond-sub">↗ Rośnie</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="height:4px"></div>
+            </div>
+
+            <!-- ── CTA: Rozpocznij Sesję ── -->
+            <div class="cta-wrap">
+                <div class="cta-btn">
+                    <div class="cta-left">
+                        <div class="session-icon">
+                            <!-- Fishing rod icon -->
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <line x1="4" y1="20" x2="17" y2="6" stroke="#fff" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <path d="M17 6 Q20 3 21 5 Q22 7 19 8 L17 6Z" fill="#fff" opacity="0.9" />
+                                <path d="M17 6 Q20 10 18 16 Q16 20 14 20" stroke="#fff" stroke-width="1.5" fill="none"
+                                    stroke-linecap="round" stroke-dasharray="2 2" />
+                                <circle cx="14" cy="20" r="1.5" fill="#34d399" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="cta-label">Rozpocznij Sesję!</div>
+                            <div class="cta-sub">Jezioro Białe · Stanowisko A · GPS ok</div>
+                        </div>
+                    </div>
+                    <div class="cta-arrow">›</div>
+                </div>
+            </div>
+
+            <div class="nav-bar">
+                <div class="nav-pill"></div>
+            </div>
+        </div>
+        <p class="phone-meta">390×844 · Ekran 09 · Meldunek na Stanowisku</p>
+    </div>
+    <script>
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 60;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 23 Zarządzanie Łowiskami</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { overflow: hidden; height: 100%; }
+
+        body {
+            background: #0a0a0c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .state-btns {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .state-btn {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #333;
+            color: #888;
+            background: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .state-btn.active {
+            background: rgba(156,163,175,.15);
+            border-color: #9ca3af;
+            color: #9ca3af;
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #0e0e12;
+            border-radius: 52px;
+            box-shadow: 0 0 0 2px #2a2a2e, 0 0 0 5px #1a1a1e,
+                0 30px 80px rgba(0,0,0,.85), inset 0 0 0 1px #242428;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px; top: 140px;
+            width: 3px; height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0;
+        }
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px; top: 120px;
+            width: 3px; height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px; left: 50%;
+            transform: translateX(-50%);
+            width: 120px; height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        /* STATUS BAR */
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        .status-bar .time { font-size: 14px; font-weight: 600; color: #e0e0e0; }
+        .status-icons { display: flex; gap: 6px; align-items: center; }
+        .status-icons svg { fill: #e0e0e0; }
+
+        /* TOP BAR */
+        .top-bar {
+            padding: 10px 16px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0e0e12;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.05);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .back-btn svg { stroke: rgba(255,255,255,.6); }
+        .top-title { flex: 1; font-size: 18px; font-weight: 600; color: #fff; }
+        .top-icon-btn {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.05);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .top-icon-btn .material-icons-outlined { font-size: 20px; color: rgba(255,255,255,.55); }
+        .add-pill {
+            height: 36px; padding: 0 14px;
+            border-radius: 18px;
+            background: rgba(156,163,175,.14);
+            border: 1px solid rgba(156,163,175,.3);
+            display: flex; align-items: center; gap: 5px;
+            cursor: pointer;
+        }
+        .add-pill .material-icons-outlined { font-size: 18px; color: #9ca3af; }
+        .add-pill-label { font-size: 13px; font-weight: 600; color: #9ca3af; }
+
+        /* ============ STATE: LIST ============ */
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            padding: 14px 16px 6px;
+        }
+        .screen-body::-webkit-scrollbar { display: none; }
+
+        .list-meta {
+            font-size: 11px;
+            color: rgba(255,255,255,.4);
+            margin-bottom: 14px;
+        }
+
+        /* Fishery card */
+        .fishery-card {
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 18px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .fishery-card-top {
+            display: flex;
+            gap: 12px;
+            padding: 13px 13px 10px;
+        }
+
+        /* Topo thumbnail */
+        .topo-thumb {
+            width: 90px;
+            height: 76px;
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+            border: 1px solid rgba(255,255,255,.07);
+        }
+
+        .topo-thumb svg { width: 100%; height: 100%; }
+
+        .topo-badge {
+            position: absolute;
+            bottom: 4px; right: 4px;
+            background: rgba(0,0,0,.6);
+            border-radius: 6px;
+            padding: 2px 5px;
+            font-size: 9px;
+            font-weight: 600;
+            color: rgba(255,255,255,.7);
+            letter-spacing: 0.3px;
+        }
+
+        .fishery-info { flex: 1; }
+        .fishery-name {
+            font-size: 14px; font-weight: 700;
+            color: rgba(255,255,255,.92);
+            margin-bottom: 3px;
+        }
+        .fishery-loc {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 11px; color: rgba(255,255,255,.5);
+            margin-bottom: 6px;
+        }
+        .fishery-loc .material-icons-outlined {
+            font-size: 13px; width: 13px; height: 13px; line-height: 13px; overflow: hidden;
+            color: rgba(255,255,255,.35);
+        }
+
+        .fishery-stats {
+            display: flex; gap: 10px;
+        }
+        .fstat {
+            font-size: 11px; color: rgba(255,255,255,.4);
+        }
+        .fstat strong { color: rgba(255,255,255,.7); font-weight: 600; }
+
+        .fishery-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            padding-right: 13px;
+            padding-top: 2px;
+        }
+
+        .action-btn {
+            width: 30px; height: 30px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.05);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .action-btn .material-icons-outlined {
+            font-size: 16px; width: 16px; height: 16px; line-height: 16px; overflow: hidden;
+            color: rgba(255,255,255,.35);
+        }
+        .action-btn.del .material-icons-outlined { color: rgba(248,113,113,.5); }
+
+        /* Species chips */
+        .species-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 0 13px 13px;
+        }
+
+        .sp-chip {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px 3px 7px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255,255,255,.65);
+            background: rgba(107,114,128,.1);
+            border: 1px solid rgba(107,114,128,.2);
+        }
+        .sp-chip .material-icons-outlined {
+            font-size: 12px; width: 12px; height: 12px; line-height: 12px; overflow: hidden;
+            color: #9ca3af;
+        }
+
+        /* ============ STATE: ADD FORM ============ */
+        .form-scroll {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+        }
+        .form-scroll::-webkit-scrollbar { display: none; }
+
+        .form-sect {
+            font-size: 10px; font-weight: 500; letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.4);
+            padding: 14px 16px 6px;
+        }
+
+        .form-group { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+
+        .field-wrap { display: flex; flex-direction: column; gap: 4px; }
+        .field-label { font-size: 11px; color: rgba(255,255,255,.5); padding-left: 2px; }
+
+        .field-input {
+            background: rgba(255,255,255,.04);
+            border: 1.5px solid rgba(255,255,255,.1);
+            border-radius: 14px;
+            padding: 11px 14px;
+            font-size: 14px;
+            color: rgba(255,255,255,.85);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .field-input.filled { border-color: rgba(156,163,175,.35); background: rgba(55,65,81,.12); }
+        .field-input.active-f { border-color: rgba(156,163,175,.5); background: rgba(156,163,175,.05); }
+        .field-placeholder { color: rgba(255,255,255,.3); }
+        .field-input .material-icons-outlined { font-size: 18px; color: rgba(255,255,255,.25); }
+
+        .field-row { display: flex; gap: 8px; }
+        .field-row .field-wrap { flex: 1; }
+
+        /* GPS coords row */
+        .gps-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 14px;
+            background: rgba(5,150,105,.08);
+            border: 1px solid rgba(52,211,153,.2);
+            border-radius: 14px;
+        }
+        .gps-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,.5); flex-shrink:0; }
+        .gps-coords { font-size: 12px; font-weight: 500; color: #34d399; }
+        .gps-label { font-size: 10px; color: rgba(52,211,153,.7); margin-top:1px; }
+
+        /* Mini map section */
+        .map-preview-wrap {
+            margin: 0 16px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1.5px solid rgba(255,255,255,.1);
+            position: relative;
+            height: 152px;
+        }
+
+        .map-preview-wrap svg { width: 100%; height: 100%; display: block; }
+
+        .map-overlay-btn {
+            position: absolute;
+            bottom: 10px; left: 50%; transform: translateX(-50%);
+            white-space: nowrap;
+            height: 34px; padding: 0 16px;
+            border-radius: 17px;
+            background: rgba(0,0,0,.65);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255,255,255,.15);
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer;
+        }
+        .map-overlay-btn .material-icons-outlined { font-size: 16px; color: rgba(255,255,255,.7); }
+        .map-overlay-btn span.lbl { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.8); }
+
+        .map-pin {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -100%);
+        }
+
+        /* Species checkboxes in form */
+        .species-checks {
+            padding: 0 16px;
+            display: flex; flex-wrap: wrap; gap: 8px;
+        }
+
+        .sp-check {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1.5px solid rgba(255,255,255,.1);
+            background: rgba(255,255,255,.03);
+            font-size: 12px; font-weight: 500;
+            color: rgba(255,255,255,.5);
+            cursor: pointer;
+        }
+        .sp-check.checked {
+            background: rgba(55,65,81,.2);
+            border-color: rgba(156,163,175,.4);
+            color: rgba(255,255,255,.8);
+        }
+        .check-icon {
+            width: 14px; height: 14px;
+            border-radius: 4px;
+            border: 1.5px solid rgba(255,255,255,.25);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sp-check.checked .check-icon {
+            background: #9ca3af;
+            border-color: #9ca3af;
+        }
+        .sp-check.checked .check-icon::after {
+            content: '';
+            width: 7px; height: 5px;
+            border-left: 2px solid #000;
+            border-bottom: 2px solid #000;
+            transform: rotate(-45deg) translate(1px, -1px);
+            display: block;
+        }
+
+        /* ============ STATE: MAP FULLSCREEN ============ */
+        .map-full {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-full svg { width: 100%; height: 100%; display: block; }
+
+        /* Crop frame */
+        .crop-frame {
+            position: absolute;
+            top: 22%; left: 10%;
+            right: 10%; bottom: 22%;
+            border: 2px dashed rgba(255,255,255,.7);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .crop-corner {
+            position: absolute;
+            width: 14px; height: 14px;
+            border-color: #fff;
+            border-style: solid;
+        }
+        .crop-corner.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 3px 0 0 0; }
+        .crop-corner.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 3px 0 0; }
+        .crop-corner.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 3px; }
+        .crop-corner.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 3px 0; }
+
+        .map-coords-banner {
+            position: absolute;
+            top: 60px; left: 50%; transform: translateX(-50%);
+            white-space: nowrap;
+            background: rgba(0,0,0,.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(52,211,153,.3);
+            border-radius: 20px;
+            padding: 7px 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .map-coords-banner .gdot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,.6); }
+        .map-coords-banner span { font-size: 12px; font-weight: 600; color: #34d399; }
+
+        .map-instruct {
+            position: absolute;
+            bottom: 100px; left: 50%; transform: translateX(-50%);
+            white-space: nowrap;
+            background: rgba(0,0,0,.65);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 20px;
+            padding: 7px 16px;
+            font-size: 12px; font-weight: 500; color: rgba(255,255,255,.7);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .map-instruct .material-icons-outlined { font-size: 15px; color: rgba(255,255,255,.5); }
+
+        /* Map pin large */
+        .map-pin-lg {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -100%);
+        }
+
+        /* Map top bar overlay */
+        .map-top-bar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 52px;
+            background: rgba(14,14,18,.85);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; gap: 10px;
+            padding: 0 16px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .map-top-bar .map-title { flex: 1; font-size: 14px; font-weight: 600; color: rgba(255,255,255,.9); }
+        .map-top-bar .close-btn {
+            width: 32px; height: 32px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.07);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .map-top-bar .close-btn .material-icons-outlined { font-size: 18px; color: rgba(255,255,255,.6); }
+        .map-crop-label {
+            font-size: 11px; font-weight: 500;
+            color: rgba(255,255,255,.5);
+            background: rgba(255,255,255,.06);
+            border-radius: 8px; padding: 3px 9px;
+        }
+
+        /* CTA wrap */
+        .cta-wrap {
+            padding: 10px 16px 8px;
+            flex-shrink: 0;
+            background: #0e0e12;
+        }
+        .cta-btn {
+            width: 100%; height: 54px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #374151, #4b5563);
+            border: 1px solid rgba(156,163,175,.25);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            cursor: pointer;
+        }
+        .cta-icon-box {
+            width: 28px; height: 28px; border-radius: 8px;
+            background: rgba(255,255,255,.1);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cta-icon-box .material-icons-outlined { font-size: 18px; color: #fff; }
+        .cta-text { font-size: 15px; font-weight: 700; color: #fff; }
+        .cta-arrow {
+            width: 22px; height: 22px; border-radius: 6px;
+            background: rgba(255,255,255,.12);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cta-arrow .material-icons-outlined { font-size: 16px; color: rgba(255,255,255,.7); }
+
+        /* Session banner */
+        .session-banner {
+            margin: 0 16px 6px;
+            padding: 9px 14px;
+            background: rgba(14,116,144,.18);
+            border: 1px solid rgba(34,211,238,.25);
+            border-radius: 14px;
+            display: flex; align-items: center; gap: 8px;
+            flex-shrink: 0;
+        }
+        .banner-dot { width: 8px; height: 8px; border-radius: 50%; background: #22d3ee; box-shadow: 0 0 8px rgba(34,211,238,.6); flex-shrink:0; }
+        .banner-text { flex: 1; font-size: 12px; font-weight: 500; color: rgba(255,255,255,.8); }
+        .banner-text strong { color: #22d3ee; }
+        .banner-arrow .material-icons-outlined { font-size: 16px; color: rgba(34,211,238,.6); }
+
+        /* Nav bar */
+        .nav-bar { height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .nav-pill { width: 100px; height: 4px; background: rgba(255,255,255,.27); border-radius: 2px; }
+
+        .phone-meta { color: #444; font-size: 11px; margin-top: 10px; letter-spacing: 1px; }
+    </style>
+</head>
+
+<body>
+    <p class="screen-label">SIEDZI! · Ekran 23 / 26 · Zarządzanie Łowiskami</p>
+    <div class="state-btns">
+        <button class="state-btn active" onclick="setState('list')">Lista łowisk</button>
+        <button class="state-btn" onclick="setState('add')">Dodaj nowe łowisko</button>
+        <button class="state-btn" onclick="setState('map')">Mapa + kadrowanie topo</button>
+    </div>
+
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone" id="phone">
+            <div class="dynamic-island"></div>
+
+            <!-- Status bar -->
+            <div class="status-bar" id="sb">
+                <span class="time">19:18</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12"><rect x="0" y="8" width="3" height="4" rx="0.5"/><rect x="4" y="5" width="3" height="7" rx="0.5"/><rect x="8" y="2" width="3" height="10" rx="0.5"/><rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35"/></svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z"/><path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12"><rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2" fill="none"/><rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6"/><rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0"/></svg>
+                </div>
+            </div>
+
+            <!-- Top bar (hidden in map state) -->
+            <div class="top-bar" id="topbar">
+                <div class="back-btn">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 12H5m0 0 7-7m-7 7 7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="top-title">Zarządzanie Łowiskami</div>
+                <div class="add-pill" onclick="setState('add')">
+                    <span class="material-icons-outlined">add</span>
+                    <span class="add-pill-label">Dodaj</span>
+                </div>
+            </div>
+
+            <!-- ====== STATE: LIST ====== -->
+            <div class="screen-body" id="state-list">
+                <p class="list-meta">3 łowiska · Dostępne przy planowaniu wyjazdów</p>
+
+                <!-- Fishery 1 -->
+                <div class="fishery-card">
+                    <div class="fishery-card-top">
+                        <div class="topo-thumb">
+                            <!-- Topo SVG: lake + contours -->
+                            <svg viewBox="0 0 90 76" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="90" height="76" fill="#1a2235"/>
+                                <!-- Contour lines -->
+                                <ellipse cx="45" cy="38" rx="40" ry="32" fill="none" stroke="rgba(100,180,80,.25)" stroke-width="1"/>
+                                <ellipse cx="45" cy="38" rx="33" ry="25" fill="none" stroke="rgba(100,180,80,.3)" stroke-width="1"/>
+                                <ellipse cx="45" cy="38" rx="26" ry="18" fill="none" stroke="rgba(100,180,80,.35)" stroke-width="1"/>
+                                <ellipse cx="45" cy="38" rx="18" ry="12" fill="none" stroke="rgba(100,180,80,.4)" stroke-width="1"/>
+                                <!-- Water body -->
+                                <ellipse cx="45" cy="40" rx="22" ry="14" fill="rgba(30,90,160,.5)"/>
+                                <ellipse cx="45" cy="40" rx="18" ry="11" fill="rgba(20,70,140,.7)"/>
+                                <!-- Shoreline -->
+                                <ellipse cx="45" cy="40" rx="22" ry="14" fill="none" stroke="rgba(100,160,255,.4)" stroke-width="1"/>
+                                <!-- Trees -->
+                                <circle cx="12" cy="15" r="5" fill="rgba(40,100,40,.7)"/>
+                                <circle cx="20" cy="12" r="4" fill="rgba(50,110,50,.6)"/>
+                                <circle cx="74" cy="18" r="5" fill="rgba(40,100,40,.7)"/>
+                                <circle cx="68" cy="22" r="4" fill="rgba(50,110,50,.6)"/>
+                                <!-- Pin -->
+                                <circle cx="45" cy="27" r="5" fill="#ef4444"/>
+                                <circle cx="45" cy="27" r="3" fill="#fff"/>
+                                <line x1="45" y1="32" x2="45" y2="28" stroke="#ef4444" stroke-width="2"/>
+                            </svg>
+                            <div class="topo-badge">TOPO</div>
+                        </div>
+                        <div class="fishery-info">
+                            <div class="fishery-name">Jezioro Przykładowe</div>
+                            <div class="fishery-loc">
+                                <span class="material-icons-outlined">place</span>
+                                Warmia-Mazury
+                            </div>
+                            <div class="fishery-stats">
+                                <span class="fstat"><strong>8</strong> wizyt</span>
+                                <span class="fstat">ostatnio <strong>3 tyg.</strong></span>
+                            </div>
+                        </div>
+                        <div class="fishery-actions" style="flex-direction:column; padding-right:0; padding-top:0; gap:5px;">
+                            <div class="action-btn"><span class="material-icons-outlined">edit</span></div>
+                            <div class="action-btn del"><span class="material-icons-outlined">delete_outline</span></div>
+                        </div>
+                    </div>
+                    <div class="species-row">
+                        <div class="sp-chip"><span class="material-icons-outlined">set_meal</span>Karp</div>
+                        <div class="sp-chip"><span class="material-icons-outlined">set_meal</span>Szczupak</div>
+                        <div class="sp-chip"><span class="material-icons-outlined">set_meal</span>Okoń</div>
+                        <div class="sp-chip"><span class="material-icons-outlined">set_meal</span>Leszcz</div>
+                    </div>
+                </div>
+
+                <!-- Fishery 2 -->
+                <div class="fishery-card">
+                    <div class="fishery-card-top">
+                        <div class="topo-thumb">
+                            <svg viewBox="0 0 90 76" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="90" height="76" fill="#1a1f2e"/>
+                                <!-- River contours -->
+                                <path d="M5 38 Q20 30 35 38 Q50 46 65 38 Q80 30 90 35" fill="none" stroke="rgba(100,180,80,.3)" stroke-width="1.5"/>
+                                <path d="M5 45 Q20 37 35 45 Q50 53 65 45 Q80 37 90 42" fill="none" stroke="rgba(100,180,80,.25)" stroke-width="1"/>
+                                <!-- River bed -->
+                                <path d="M0 35 Q15 27 30 35 Q45 43 60 35 Q75 27 90 32" fill="rgba(20,70,140,.55)"/>
+                                <path d="M0 42 Q15 34 30 42 Q45 50 60 42 Q75 34 90 39 L90 32 Q75 27 60 35 Q45 43 30 35 Q15 27 0 35Z" fill="rgba(20,70,140,.55)"/>
+                                <!-- Banks -->
+                                <path d="M0 35 Q15 27 30 35 Q45 43 60 35 Q75 27 90 32" fill="none" stroke="rgba(100,160,255,.35)" stroke-width="1"/>
+                                <path d="M0 42 Q15 34 30 42 Q45 50 60 42 Q75 34 90 39" fill="none" stroke="rgba(100,160,255,.35)" stroke-width="1"/>
+                                <!-- Hills -->
+                                <ellipse cx="12" cy="20" rx="14" ry="10" fill="none" stroke="rgba(100,180,80,.25)" stroke-width="1"/>
+                                <ellipse cx="78" cy="58" rx="12" ry="8" fill="none" stroke="rgba(100,180,80,.25)" stroke-width="1"/>
+                                <circle cx="12" cy="20" r="5" fill="rgba(80,130,60,.4)"/>
+                                <circle cx="78" cy="58" r="4" fill="rgba(80,130,60,.4)"/>
+                                <!-- Pin -->
+                                <circle cx="45" cy="38" r="5" fill="#ef4444"/>
+                                <circle cx="45" cy="38" r="3" fill="#fff"/>
+                            </svg>
+                            <div class="topo-badge">TOPO</div>
+                        </div>
+                        <div class="fishery-info">
+                            <div class="fishery-name">Narwia – Odcinek Wschód</div>
+                            <div class="fishery-loc">
+                                <span class="material-icons-outlined">place</span>
+                                Podlaskie
+                            </div>
+                            <div class="fishery-stats">
+                                <span class="fstat"><strong>5</strong> wizyt</span>
+                                <span class="fstat">ostatnio <strong>6 tyg.</strong></span>
+                            </div>
+                        </div>
+                        <div class="fishery-actions" style="flex-direction:column; padding-right:0; padding-top:0; gap:5px;">
+                            <div class="action-btn"><span class="material-icons-outlined">edit</span></div>
+                            <div class="action-btn del"><span class="material-icons-outlined">delete_outline</span></div>
+                        </div>
+                    </div>
+                    <div class="species-row">
+                        <div class="sp-chip"><span class="material-icons-outlined">set_meal</span>Kleń</div>
+                        <div class="sp-chip"><span class="material-icons-outlined">set_meal</span>Brzana</div>
+                        <div class="sp-chip"><span class="material-icons-outlined">set_meal</span>Szczupak</div>
+                    </div>
+                </div>
+
+                <!-- Fishery 3 -->
+                <div class="fishery-card">
+                    <div class="fishery-card-top">
+                        <div class="topo-thumb">
+                            <svg viewBox="0 0 90 76" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="90" height="76" fill="#1c2030"/>
+                                <ellipse cx="48" cy="42" rx="36" ry="28" fill="none" stroke="rgba(100,180,80,.2)" stroke-width="1"/>
+                                <ellipse cx="48" cy="42" rx="28" ry="21" fill="none" stroke="rgba(100,180,80,.28)" stroke-width="1"/>
+                                <!-- Dam shape top -->
+                                <rect x="25" y="10" width="40" height="6" rx="2" fill="rgba(150,120,80,.5)" stroke="rgba(200,170,100,.3)" stroke-width="1"/>
+                                <!-- Large reservoir -->
+                                <ellipse cx="48" cy="44" rx="32" ry="22" fill="rgba(20,60,120,.6)"/>
+                                <ellipse cx="48" cy="44" rx="28" ry="18" fill="rgba(15,50,110,.7)"/>
+                                <ellipse cx="48" cy="44" rx="32" ry="22" fill="none" stroke="rgba(80,140,220,.35)" stroke-width="1"/>
+                                <circle cx="10" cy="18" r="5" fill="rgba(40,90,40,.6)"/>
+                                <circle cx="80" cy="22" r="4" fill="rgba(40,90,40,.6)"/>
+                                <!-- Pin -->
+                                <circle cx="48" cy="35" r="5" fill="#ef4444"/>
+                                <circle cx="48" cy="35" r="3" fill="#fff"/>
+                                <line x1="48" y1="40" x2="48" y2="36" stroke="#ef4444" stroke-width="2"/>
+                            </svg>
+                            <div class="topo-badge">TOPO</div>
+                        </div>
+                        <div class="fishery-info">
+                            <div class="fishery-name">Zbiornik Zegrzyński</div>
+                            <div class="fishery-loc">
+                                <span class="material-icons-outlined">place</span>
+                                Mazowsze
+                            </div>
+                            <div class="fishery-stats">
+                                <span class="fstat"><strong>3</strong> wizyty</span>
+                                <span class="fstat">ostatnio <strong>2 mies.</strong></span>
+                            </div>
+                        </div>
+                        <div class="fishery-actions" style="flex-direction:column; padding-right:0; padding-top:0; gap:5px;">
+                            <div class="action-btn"><span class="material-icons-outlined">edit</span></div>
+                            <div class="action-btn del"><span class="material-icons-outlined">delete_outline</span></div>
+                        </div>
+                    </div>
+                    <div class="species-row">
+                        <div class="sp-chip"><span class="material-icons-outlined">set_meal</span>Sandacz</div>
+                        <div class="sp-chip"><span class="material-icons-outlined">set_meal</span>Okoń</div>
+                        <div class="sp-chip"><span class="material-icons-outlined">set_meal</span>Leszcz</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== STATE: ADD FORM ====== -->
+            <div class="form-scroll" id="state-add" style="display:none;">
+                <div class="form-sect">Informacje podstawowe</div>
+                <div class="form-group">
+                    <div class="field-wrap">
+                        <span class="field-label">Nazwa łowiska *</span>
+                        <div class="field-input active-f">
+                            <span>Jezioro Nowe #4</span>
+                        </div>
+                    </div>
+                    <div class="field-wrap">
+                        <span class="field-label">Adres / miejscowość</span>
+                        <div class="field-input filled" style="justify-content:space-between;">
+                            <span>Giżycko, Warmia-Mazury</span>
+                            <span class="material-icons-outlined" style="color:rgba(52,211,153,.5);">my_location</span>
+                        </div>
+                    </div>
+                    <div class="field-wrap">
+                        <span class="field-label">Nr stanowiska (opcjonalny)</span>
+                        <div class="field-input">
+                            <span class="field-placeholder">np. Stanowisko 7, Sektor A…</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GPS coords (auto) -->
+                <div style="padding: 8px 16px 0;">
+                    <div class="gps-row">
+                        <div class="gps-dot"></div>
+                        <div>
+                            <div class="gps-coords">53°46'24.1"N  21°18'09.3"E</div>
+                            <div class="gps-label">GPS pobrane ze znacznika na mapie</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-sect">Lokalizacja na mapie</div>
+                <div class="map-preview-wrap">
+                    <svg viewBox="0 0 358 152" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="358" height="152" fill="#1a2235"/>
+                        <!-- Grid lines -->
+                        <line x1="0" y1="30" x2="358" y2="30" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                        <line x1="0" y1="60" x2="358" y2="60" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                        <line x1="0" y1="90" x2="358" y2="90" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                        <line x1="0" y1="120" x2="358" y2="120" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                        <line x1="60" y1="0" x2="60" y2="152" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                        <line x1="120" y1="0" x2="120" y2="152" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                        <line x1="180" y1="0" x2="180" y2="152" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                        <line x1="240" y1="0" x2="240" y2="152" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                        <line x1="300" y1="0" x2="300" y2="152" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                        <!-- Contour shapes -->
+                        <ellipse cx="179" cy="76" rx="80" ry="55" fill="none" stroke="rgba(80,160,60,.2)" stroke-width="1"/>
+                        <ellipse cx="179" cy="76" rx="60" ry="40" fill="none" stroke="rgba(80,160,60,.25)" stroke-width="1"/>
+                        <ellipse cx="179" cy="76" rx="40" ry="26" fill="none" stroke="rgba(80,160,60,.3)" stroke-width="1"/>
+                        <!-- Lake -->
+                        <ellipse cx="179" cy="78" rx="35" ry="22" fill="rgba(20,70,150,.55)"/>
+                        <ellipse cx="179" cy="78" rx="35" ry="22" fill="none" stroke="rgba(80,140,255,.4)" stroke-width="1"/>
+                        <!-- Roads -->
+                        <path d="M0 100 Q90 85 179 90 Q270 95 358 80" fill="none" stroke="rgba(200,180,100,.3)" stroke-width="2"/>
+                        <!-- Green patches -->
+                        <circle cx="50" cy="40" r="18" fill="rgba(40,90,40,.3)"/>
+                        <circle cx="300" cy="120" r="22" fill="rgba(40,90,40,.3)"/>
+                    </svg>
+                    <!-- Pin on mini-map -->
+                    <div class="map-pin">
+                        <svg width="20" height="28" viewBox="0 0 20 28">
+                            <path d="M10 0 C4.5 0 0 4.5 0 10 C0 17 10 28 10 28 C10 28 20 17 20 10 C20 4.5 15.5 0 10 0Z" fill="#ef4444"/>
+                            <circle cx="10" cy="10" r="4" fill="#fff"/>
+                        </svg>
+                    </div>
+                    <div class="map-overlay-btn" onclick="setState('map')">
+                        <span class="material-icons-outlined">open_in_full</span>
+                        <span class="lbl">Otwórz mapę pełnoekranową</span>
+                    </div>
+                </div>
+
+                <div class="form-sect">Gatunki ryb w łowisku</div>
+                <div class="species-checks">
+                    <div class="sp-check checked"><div class="check-icon"></div>Karp</div>
+                    <div class="sp-check checked"><div class="check-icon"></div>Szczupak</div>
+                    <div class="sp-check"><div class="check-icon"></div>Okoń</div>
+                    <div class="sp-check"><div class="check-icon"></div>Lin</div>
+                    <div class="sp-check"><div class="check-icon"></div>Sandacz</div>
+                    <div class="sp-check"><div class="check-icon"></div>Leszcz</div>
+                    <div class="sp-check"><div class="check-icon"></div>Kleń</div>
+                    <div class="sp-check"><div class="check-icon"></div>Brzana</div>
+                    <div class="sp-check"><div class="check-icon"></div>Sum</div>
+                    <div class="sp-check"><div class="check-icon"></div>Amur</div>
+                </div>
+
+                <div class="form-sect">Notatka</div>
+                <div class="form-group">
+                    <div class="field-wrap">
+                        <div class="field-input" style="min-height:56px; align-items:flex-start; padding-top:12px;">
+                            <span class="field-placeholder">Opcjonalne uwagi, zakazy, przepisy…</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="height: 16px;"></div>
+            </div>
+
+            <!-- ====== STATE: MAP FULLSCREEN ====== -->
+            <div class="map-full" id="state-map" style="display:none;">
+                <svg viewBox="0 0 390 600" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
+                    <defs>
+                        <radialGradient id="topoGrad" cx="50%" cy="50%" r="60%">
+                            <stop offset="0%" stop-color="#1f2d1a"/>
+                            <stop offset="60%" stop-color="#192618"/>
+                            <stop offset="100%" stop-color="#141c10"/>
+                        </radialGradient>
+                    </defs>
+                    <rect width="390" height="600" fill="url(#topoGrad)"/>
+                    <!-- Grid -->
+                    <line x1="0" y1="100" x2="390" y2="100" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                    <line x1="0" y1="200" x2="390" y2="200" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                    <line x1="0" y1="300" x2="390" y2="300" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                    <line x1="0" y1="400" x2="390" y2="400" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                    <line x1="0" y1="500" x2="390" y2="500" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                    <line x1="78" y1="0" x2="78" y2="600" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                    <line x1="156" y1="0" x2="156" y2="600" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                    <line x1="234" y1="0" x2="234" y2="600" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                    <line x1="312" y1="0" x2="312" y2="600" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+
+                    <!-- Large contour rings -->
+                    <ellipse cx="195" cy="300" rx="175" ry="130" fill="none" stroke="rgba(100,190,70,.18)" stroke-width="1.2"/>
+                    <ellipse cx="195" cy="300" rx="150" ry="110" fill="none" stroke="rgba(100,190,70,.22)" stroke-width="1.2"/>
+                    <ellipse cx="195" cy="300" rx="125" ry="88" fill="none" stroke="rgba(100,190,70,.26)" stroke-width="1.2"/>
+                    <ellipse cx="195" cy="300" rx="100" ry="68" fill="none" stroke="rgba(100,190,70,.3)" stroke-width="1.2"/>
+                    <ellipse cx="195" cy="300" rx="78" ry="50" fill="none" stroke="rgba(100,190,70,.34)" stroke-width="1.2"/>
+
+                    <!-- Lake -->
+                    <ellipse cx="195" cy="304" rx="72" ry="44" fill="rgba(20,65,140,.65)"/>
+                    <ellipse cx="195" cy="304" rx="65" ry="38" fill="rgba(16,55,125,.75)"/>
+                    <!-- Water shimmer -->
+                    <ellipse cx="175" cy="292" rx="25" ry="12" fill="rgba(80,150,255,.12)"/>
+                    <!-- Shore -->
+                    <ellipse cx="195" cy="304" rx="72" ry="44" fill="none" stroke="rgba(80,150,255,.4)" stroke-width="1.5"/>
+
+                    <!-- Road -->
+                    <path d="M0 190 Q100 170 195 200 Q290 230 390 210" fill="none" stroke="rgba(220,200,120,.35)" stroke-width="3"/>
+                    <path d="M0 195 Q100 175 195 205 Q290 235 390 215" fill="none" stroke="rgba(220,200,120,.15)" stroke-width="1"/>
+
+                    <!-- Forest patches -->
+                    <circle cx="60" cy="100" r="32" fill="rgba(35,80,30,.4)"/>
+                    <circle cx="80" cy="115" r="24" fill="rgba(40,90,35,.4)"/>
+                    <circle cx="340" cy="480" r="40" fill="rgba(35,80,30,.4)"/>
+                    <circle cx="315" cy="460" r="28" fill="rgba(40,90,35,.35)"/>
+                    <circle cx="50" cy="490" r="30" fill="rgba(35,80,30,.35)"/>
+
+                    <!-- Small structures -->
+                    <rect x="240" y="140" width="16" height="12" rx="2" fill="rgba(160,140,100,.4)" stroke="rgba(200,180,130,.2)" stroke-width="1"/>
+                    <rect x="120" y="430" width="20" height="14" rx="2" fill="rgba(160,140,100,.4)" stroke="rgba(200,180,130,.2)" stroke-width="1"/>
+
+                    <!-- Crop frame dimming -->
+                    <rect width="390" height="600" fill="rgba(0,0,0,.35)"/>
+                    <!-- Crop clear area -->
+                    <rect x="39" y="132" width="312" height="246" fill="rgba(0,0,0,0)" style="mix-blend-mode: normal;"/>
+
+                    <!-- Crop frame highlight (re-draw lake/topo in crop zone bright) -->
+                    <clipPath id="cropClip"><rect x="39" y="132" width="312" height="246"/></clipPath>
+                    <g clip-path="url(#cropClip)">
+                        <rect width="390" height="600" fill="url(#topoGrad)"/>
+                        <ellipse cx="195" cy="300" rx="175" ry="130" fill="none" stroke="rgba(100,190,70,.18)" stroke-width="1.2"/>
+                        <ellipse cx="195" cy="300" rx="150" ry="110" fill="none" stroke="rgba(100,190,70,.22)" stroke-width="1.2"/>
+                        <ellipse cx="195" cy="300" rx="125" ry="88" fill="none" stroke="rgba(100,190,70,.26)" stroke-width="1.2"/>
+                        <ellipse cx="195" cy="300" rx="100" ry="68" fill="none" stroke="rgba(100,190,70,.3)" stroke-width="1.2"/>
+                        <ellipse cx="195" cy="300" rx="78" ry="50" fill="none" stroke="rgba(100,190,70,.34)" stroke-width="1.2"/>
+                        <ellipse cx="195" cy="304" rx="72" ry="44" fill="rgba(20,65,140,.65)"/>
+                        <ellipse cx="195" cy="304" rx="65" ry="38" fill="rgba(16,55,125,.75)"/>
+                        <ellipse cx="175" cy="292" rx="25" ry="12" fill="rgba(80,150,255,.12)"/>
+                        <ellipse cx="195" cy="304" rx="72" ry="44" fill="none" stroke="rgba(80,150,255,.4)" stroke-width="1.5"/>
+                        <path d="M0 190 Q100 170 195 200 Q290 230 390 210" fill="none" stroke="rgba(220,200,120,.35)" stroke-width="3"/>
+                        <circle cx="60" cy="100" r="32" fill="rgba(35,80,30,.4)"/>
+                        <circle cx="340" cy="480" r="40" fill="rgba(35,80,30,.4)"/>
+                        <rect x="240" y="140" width="16" height="12" rx="2" fill="rgba(160,140,100,.4)"/>
+                    </g>
+                </svg>
+
+                <!-- Crop frame overlay -->
+                <div class="crop-frame">
+                    <div class="crop-corner tl"></div>
+                    <div class="crop-corner tr"></div>
+                    <div class="crop-corner bl"></div>
+                    <div class="crop-corner br"></div>
+                </div>
+
+                <!-- Pin -->
+                <div class="map-pin-lg">
+                    <svg width="28" height="38" viewBox="0 0 28 38">
+                        <path d="M14 0 C6.3 0 0 6.3 0 14 C0 24 14 38 14 38 C14 38 28 24 28 14 C28 6.3 21.7 0 14 0Z" fill="#ef4444" opacity="0.95"/>
+                        <circle cx="14" cy="14" r="6" fill="#fff"/>
+                        <circle cx="14" cy="14" r="3" fill="#ef4444"/>
+                    </svg>
+                </div>
+
+                <!-- GPS banner top -->
+                <div class="map-coords-banner">
+                    <div class="gdot"></div>
+                    <span>53°46'24.1"N · 21°18'09.3"E</span>
+                </div>
+
+                <!-- Instruction -->
+                <div class="map-instruct">
+                    <span class="material-icons-outlined">touch_app</span>
+                    Przesuń kadr, by objąć całe łowisko
+                </div>
+
+                <!-- Top overlay bar -->
+                <div class="map-top-bar">
+                    <div class="close-btn" onclick="setState('add')">
+                        <span class="material-icons-outlined">close</span>
+                    </div>
+                    <span class="map-title">Wybierz lokalizację</span>
+                    <span class="map-crop-label">Kadruj widok TOPO</span>
+                </div>
+            </div>
+
+            <!-- CTA: add form -->
+            <div class="cta-wrap" id="cta-add" style="display:none;">
+                <div class="cta-btn">
+                    <div class="cta-icon-box"><span class="material-icons-outlined">save</span></div>
+                    <span class="cta-text">Zapisz łowisko</span>
+                    <div class="cta-arrow"><span class="material-icons-outlined">chevron_right</span></div>
+                </div>
+            </div>
+
+            <!-- CTA: map -->
+            <div class="cta-wrap" id="cta-map" style="display:none;">
+                <div class="cta-btn" onclick="setState('add')">
+                    <div class="cta-icon-box"><span class="material-icons-outlined">crop</span></div>
+                    <span class="cta-text">Zapisz wycinek topo</span>
+                    <div class="cta-arrow"><span class="material-icons-outlined">chevron_right</span></div>
+                </div>
+            </div>
+
+            <!-- Active Session Banner -->
+            <div class="session-banner" id="session-banner">
+                <div class="banner-dot"></div>
+                <span class="banner-text"><strong>Sesja aktywna</strong> · 3h 42min</span>
+                <div class="banner-arrow"><span class="material-icons-outlined">chevron_right</span></div>
+            </div>
+
+            <!-- Nav bar -->
+            <div class="nav-bar"><div class="nav-pill"></div></div>
+        </div>
+        <p class="phone-meta">390×844 · Ekran 23 · Zarządzanie Łowiskami</p>
+    </div>
+
+    <script>
+        function setState(s) {
+            var stateList = document.getElementById('state-list');
+            var stateAdd  = document.getElementById('state-add');
+            var stateMap  = document.getElementById('state-map');
+            var ctaAdd    = document.getElementById('cta-add');
+            var ctaMap    = document.getElementById('cta-map');
+            var topbar    = document.getElementById('topbar');
+            var sb        = document.getElementById('sb');
+            var banner    = document.getElementById('session-banner');
+
+            stateList.style.display = 'none';
+            stateAdd.style.display  = 'none';
+            stateMap.style.display  = 'none';
+            ctaAdd.style.display    = 'none';
+            ctaMap.style.display    = 'none';
+            topbar.style.display    = 'flex';
+            sb.style.background     = '#0e0e12';
+            banner.style.display    = 'flex';
+
+            if (s === 'list') {
+                stateList.style.display = 'block';
+            } else if (s === 'add') {
+                stateAdd.style.display = 'block';
+                ctaAdd.style.display   = 'block';
+            } else if (s === 'map') {
+                stateMap.style.display = 'flex';
+                ctaMap.style.display   = 'block';
+                topbar.style.display   = 'none';
+                sb.style.background    = 'transparent';
+                banner.style.display   = 'none'; // hidden in map fullscreen
+            }
+
+            document.querySelectorAll('.state-btn').forEach(function(b, i) {
+                b.classList.toggle('active',
+                    (i === 0 && s === 'list') ||
+                    (i === 1 && s === 'add')  ||
+                    (i === 2 && s === 'map'));
+            });
+        }
+
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 90;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+</body>
+</html>

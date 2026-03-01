@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 01 Splash Screen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ─── Reset ─── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        /* ─── Page layout ─── */
+        body {
+            background: #121212;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* ─── Phone frame ─── */
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #101014;
+            border-radius: 52px;
+            box-shadow:
+                0 0 0 2px #2a2a2e,
+                0 0 0 5px #1a1a1e,
+                0 30px 80px rgba(0, 0, 0, 0.8),
+                inset 0 0 0 1px #2e2e35;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── Status Bar ─── */
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .status-bar .time {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0;
+            letter-spacing: 0.2px;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .status-icons svg {
+            fill: #e0e0e0;
+        }
+
+        /* ─── Dynamic Island / Notch ─── */
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        /* ─── Splash content ─── */
+        .splash-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding-bottom: 34px;
+            /* nav bar space */
+        }
+
+        /* Animated background gradient */
+        .splash-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 55% at 50% 40%, rgba(14, 116, 144, 0.25) 0%, transparent 70%),
+                radial-gradient(ellipse 80% 40% at 50% 80%, rgba(14, 116, 144, 0.10) 0%, transparent 60%),
+                linear-gradient(180deg, #0a0d12 0%, #0d1117 50%, #0a0f0d 100%);
+            animation: breathe 6s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.85;
+            }
+        }
+
+        /* Water ripple rings (purely decorative) */
+        .ripple-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(34, 211, 238, 0.12);
+            animation: ripple 4s ease-out infinite;
+            left: 50%;
+            top: 42%;
+            transform: translate(-50%, -50%);
+        }
+
+        .ripple-ring:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            animation-delay: 0s;
+        }
+
+        .ripple-ring:nth-child(2) {
+            width: 140px;
+            height: 140px;
+            animation-delay: 0.8s;
+        }
+
+        .ripple-ring:nth-child(3) {
+            width: 210px;
+            height: 210px;
+            animation-delay: 1.6s;
+        }
+
+        .ripple-ring:nth-child(4) {
+            width: 300px;
+            height: 300px;
+            animation-delay: 2.4s;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(0.6);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Logo container */
+        .logo-wrap {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            animation: logoReveal 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes logoReveal {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Fish hook icon – SVG */
+        .logo-icon {
+            width: 88px;
+            height: 88px;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 0 24px rgba(34, 211, 238, 0.55));
+            animation: iconGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes iconGlow {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.45));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 32px rgba(34, 211, 238, 0.80));
+            }
+        }
+
+        /* App name */
+        .app-name {
+            font-family: 'Roboto Condensed', 'Roboto', sans-serif;
+            font-size: 62px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            line-height: 1;
+            color: #fff;
+            text-shadow:
+                0 0 40px rgba(34, 211, 238, 0.4),
+                0 2px 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .app-name .exclamation {
+            color: #22d3ee;
+            text-shadow:
+                0 0 20px rgba(34, 211, 238, 0.9),
+                0 0 40px rgba(34, 211, 238, 0.5);
+        }
+
+        .app-tagline {
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 3.5px;
+            text-transform: uppercase;
+            color: rgba(34, 211, 238, 0.65);
+            animation: taglineFade 1.8s 0.6s ease both;
+        }
+
+        @keyframes taglineFade {
+            from {
+                opacity: 0;
+                letter-spacing: 6px;
+            }
+
+            to {
+                opacity: 1;
+                letter-spacing: 3.5px;
+            }
+        }
+
+        /* Loading dots */
+        .loading-dots {
+            margin-top: 56px;
+            display: flex;
+            gap: 8px;
+            position: relative;
+            z-index: 5;
+            animation: dotsAppear 0.5s 1.4s ease both;
+        }
+
+        @keyframes dotsAppear {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(34, 211, 238, 0.5);
+            animation: dotBounce 1.4s ease-in-out infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dotBounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0.8);
+                opacity: 0.4;
+                background: rgba(34, 211, 238, 0.4);
+            }
+
+            40% {
+                transform: scale(1.25);
+                opacity: 1;
+                background: rgba(34, 211, 238, 0.9);
+            }
+        }
+
+        /* Version / author hint at bottom */
+        .splash-bottom {
+            position: absolute;
+            bottom: 56px;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            z-index: 5;
+            animation: dotsAppear 0.5s 1.8s ease both;
+        }
+
+        .version-text {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.18);
+            letter-spacing: 0.8px;
+        }
+
+        /* ─── Android Navigation Bar ─── */
+        .nav-bar {
+            height: 34px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-pill {
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        /* ─── Side buttons on phone ─── */
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 140px;
+            width: 3px;
+            height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px;
+            top: 120px;
+            width: 3px;
+            height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e;
+        }
+
+        /* label below phone */
+        .phone-meta {
+            color: #555;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* ─── Autoscale wrap ─── */
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <p class="screen-label">SIEDZI! · Ekran 01 / 26 · Splash Screen</p>
+
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+            <!-- Dynamic Island -->
+        <div class="dynamic-island"></div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="time">21:30</span>
+            <div class="status-icons">
+                <!-- Signal -->
+                <svg width="16" height="12" viewBox="0 0 16 12">
+                    <rect x="0" y="8" width="3" height="4" rx="0.5" opacity="1" />
+                    <rect x="4" y="5" width="3" height="7" rx="0.5" opacity="1" />
+                    <rect x="8" y="2" width="3" height="10" rx="0.5" opacity="1" />
+                    <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35" />
+                </svg>
+                <!-- WiFi -->
+                <svg width="16" height="12" viewBox="0 0 16 12">
+                    <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z" />
+                    <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                        stroke-linecap="round" />
+                    <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                        stroke-linecap="round" />
+                </svg>
+                <!-- Battery -->
+                <svg width="22" height="12" viewBox="0 0 22 12">
+                    <rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2" fill="none" />
+                    <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6" />
+                    <rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Splash content -->
+        <div class="splash-content">
+            <!-- Animated background -->
+            <div class="splash-bg"></div>
+
+            <!-- Water ripple rings -->
+            <div class="ripple-ring"></div>
+            <div class="ripple-ring"></div>
+            <div class="ripple-ring"></div>
+            <div class="ripple-ring"></div>
+
+            <!-- Logo -->
+            <div class="logo-wrap">
+                <!-- Fish hook SVG icon -->
+                <svg class="logo-icon" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Outer glow circle -->
+                    <circle cx="44" cy="44" r="40" fill="rgba(14,116,144,0.15)" />
+                    <circle cx="44" cy="44" r="34" fill="rgba(14,116,144,0.10)" />
+
+                    <!-- Fish hook shape -->
+                    <!-- Vertical line down -->
+                    <line x1="44" y1="14" x2="44" y2="52" stroke="#22d3ee" stroke-width="3.5" stroke-linecap="round" />
+                    <!-- Hook curve -->
+                    <path d="M44 52 Q44 70 55 70 Q66 70 66 59 Q66 52 59 52" stroke="#22d3ee" stroke-width="3.5"
+                        stroke-linecap="round" fill="none" />
+                    <!-- Hook point / barb -->
+                    <path d="M59 52 L55 58" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" />
+                    <!-- Eye of hook -->
+                    <circle cx="44" cy="18" r="5" stroke="#22d3ee" stroke-width="3" fill="none" />
+                    <!-- Eye opening -->
+                    <path d="M44 13 Q44 10 47 10" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round"
+                        fill="none" />
+
+                    <!-- Small fishing line going up from eye -->
+                    <line x1="44" y1="10" x2="44" y2="4" stroke="rgba(34,211,238,0.4)" stroke-width="1.5"
+                        stroke-linecap="round" stroke-dasharray="2 2" />
+
+                    <!-- Bait / lure teardrop -->
+                    <ellipse cx="51" cy="62" rx="4" ry="6" fill="rgba(34,211,238,0.25)" stroke="rgba(34,211,238,0.5)"
+                        stroke-width="1" />
+                </svg>
+
+                <div class="app-name">SIEDZI<span class="exclamation">!</span></div>
+                <div class="app-tagline">Dziennik Połowów</div>
+            </div>
+
+            <!-- Loading indicator -->
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+
+            <!-- Bottom version -->
+            <div class="splash-bottom">
+                <div class="version-text">v1.0.0 · offline first</div>
+            </div>
+        </div>
+
+        <!-- Android nav bar -->
+        <div class="nav-bar">
+            <div class="nav-pill"></div>
+        </div>
+
+        </div><!-- /.phone -->
+        <p class="phone-meta">390 × 844 · Android · MD3 Dark · Ekran startowy</p>
+    </div><!-- /.phone-wrap -->
+
+    <script>
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 60;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+
+</body>
+
+</html>

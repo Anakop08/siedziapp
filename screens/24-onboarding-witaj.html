@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 24 Onboarding: Witaj w SIEDZI!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { overflow: hidden; height: 100%; }
+
+        body {
+            background: #060c10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+
+        /* Phone frame */
+        .phone {
+            width: 390px;
+            height: 844px;
+            border-radius: 52px;
+            box-shadow: 0 0 0 2px #1a2235, 0 0 0 5px #0e1520,
+                0 30px 80px rgba(0,0,0,.9), inset 0 0 0 1px #1a2a3a;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            /* Atmospheric dark gradient bg */
+            background:
+                radial-gradient(ellipse at 25% 18%, rgba(14,116,144,.38) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 85%, rgba(30,64,175,.28) 0%, transparent 55%),
+                radial-gradient(ellipse at 60% 40%, rgba(5,150,105,.12) 0%, transparent 50%),
+                #060c10;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px; top: 140px;
+            width: 3px; height: 60px;
+            background: #1a2235;
+            border-radius: 0 3px 3px 0;
+        }
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px; top: 120px;
+            width: 3px; height: 36px;
+            background: #1a2235;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #1a2235, 0 86px 0 #1a2235;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px; left: 50%;
+            transform: translateX(-50%);
+            width: 120px; height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        /* Stars background */
+        .stars {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Water ripple at bottom */
+        .water-ripple {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 120px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Status bar */
+        .status-bar {
+            position: relative;
+            z-index: 10;
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .status-bar .time { font-size: 14px; font-weight: 600; color: rgba(255,255,255,.75); }
+        .status-icons { display: flex; gap: 6px; align-items: center; }
+        .status-icons svg { fill: rgba(255,255,255,.65); }
+
+        /* Scrollable body */
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+        }
+        .screen-body::-webkit-scrollbar { display: none; }
+
+        /* ---- HERO ---- */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 24px 0;
+            gap: 0;
+        }
+
+        .logo-icon {
+            margin-bottom: 12px;
+        }
+
+        .app-name {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 58px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -1px;
+            line-height: 1;
+            text-align: center;
+        }
+
+        .app-name .accent {
+            color: #22d3ee;
+        }
+
+        .tagline-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+            margin-bottom: 4px;
+        }
+
+        .tagline-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(34,211,238,.3));
+        }
+        .tagline-line.right {
+            background: linear-gradient(90deg, rgba(34,211,238,.3), transparent);
+        }
+
+        .tagline {
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 3.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.45);
+        }
+
+        /* ---- HERO STATS ROW ---- */
+        .hero-stats {
+            display: flex;
+            gap: 0;
+            margin: 16px 24px 0;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .hstat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 8px;
+            gap: 2px;
+        }
+
+        .hstat + .hstat {
+            border-left: 1px solid rgba(255,255,255,.06);
+        }
+
+        .hstat-val {
+            font-size: 17px;
+            font-weight: 700;
+            color: #22d3ee;
+        }
+
+        .hstat-lbl {
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.45);
+            text-align: center;
+        }
+
+        /* ---- VALUE CARDS ---- */
+        .value-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 16px 16px 0;
+        }
+
+        .value-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 18px;
+        }
+
+        .value-card.teal {
+            background: rgba(14,116,144,.14);
+            border: 1px solid rgba(34,211,238,.2);
+        }
+        .value-card.green {
+            background: rgba(5,150,105,.12);
+            border: 1px solid rgba(52,211,153,.2);
+        }
+        .value-card.amber {
+            background: rgba(217,119,6,.1);
+            border: 1px solid rgba(251,191,36,.18);
+        }
+
+        .vc-icon {
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .value-card.teal .vc-icon  { background: rgba(14,116,144,.35); }
+        .value-card.green .vc-icon { background: rgba(5,150,105,.3); }
+        .value-card.amber .vc-icon { background: rgba(217,119,6,.25); }
+
+        .vc-icon .material-icons-outlined {
+            font-size: 22px; width: 22px; height: 22px; line-height: 22px;
+        }
+
+        .value-card.teal .vc-icon .material-icons-outlined  { color: #22d3ee; }
+        .value-card.green .vc-icon .material-icons-outlined { color: #34d399; }
+        .value-card.amber .vc-icon .material-icons-outlined { color: #fbbf24; }
+
+        .vc-texts { flex: 1; }
+
+        .vc-title {
+            font-size: 14px; font-weight: 700;
+            color: rgba(255,255,255,.95);
+            margin-bottom: 3px;
+        }
+
+        .vc-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,.55);
+            line-height: 1.5;
+        }
+
+        .vc-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin-top: 5px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .value-card.teal .vc-tag  { background: rgba(34,211,238,.12); color: #22d3ee; }
+        .value-card.green .vc-tag { background: rgba(52,211,153,.12); color: #34d399; }
+        .value-card.amber .vc-tag { background: rgba(251,191,36,.12); color: #fbbf24; }
+
+        /* ---- FEATURE PILLS ---- */
+        .pills-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.3);
+            text-align: center;
+            margin: 14px 0 8px;
+        }
+
+        .pills-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .feature-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.1);
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255,255,255,.55);
+        }
+
+        .feature-pill .material-icons-outlined {
+            font-size: 13px; width: 13px; height: 13px; line-height: 13px;
+            overflow: hidden;
+            color: rgba(255,255,255,.35);
+        }
+
+        /* ---- STEP DOTS ---- */
+        .step-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin: 12px 0 0;
+        }
+
+        .step-dot {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,.2);
+            transition: width .3s, background .3s;
+            width: 8px;
+        }
+
+        .step-dot.active {
+            width: 24px;
+            background: #22d3ee;
+        }
+
+        /* Spacer */
+        .flex-grow { flex: 1; }
+
+        /* ---- CTA AREA ---- */
+        .cta-area {
+            padding: 0 16px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .cta-onboarding {
+            width: 100%;
+            height: 56px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #0e7490, #0891b2);
+            border: 1px solid rgba(34,211,238,.35);
+            box-shadow: 0 4px 28px rgba(14,116,144,.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .cta-rod-icon {
+            width: 32px; height: 32px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.12);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .cta-onboarding-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.3px;
+        }
+
+        .cta-arrow-circle {
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.15);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cta-arrow-circle .material-icons-outlined { font-size: 18px; color: #fff; }
+
+        .skip-link {
+            font-size: 13px;
+            color: rgba(255,255,255,.4);
+            padding: 4px 16px;
+            cursor: pointer;
+        }
+
+        .skip-link:hover { color: rgba(255,255,255,.6); }
+
+        .phone-meta {
+            color: #2a3a4a;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <p class="screen-label">SIEDZI! · Ekran 24 / 26 · Onboarding: Witaj w SIEDZI!</p>
+
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+            <div class="dynamic-island"></div>
+
+            <!-- Stars background -->
+            <svg class="stars" viewBox="0 0 390 844" xmlns="http://www.w3.org/2000/svg">
+                <!-- Scattered stars -->
+                <circle cx="45"  cy="80"  r="1"   fill="rgba(255,255,255,.5)"/>
+                <circle cx="120" cy="50"  r="0.8" fill="rgba(255,255,255,.4)"/>
+                <circle cx="200" cy="70"  r="1.2" fill="rgba(255,255,255,.6)"/>
+                <circle cx="280" cy="45"  r="0.7" fill="rgba(255,255,255,.35)"/>
+                <circle cx="340" cy="90"  r="1"   fill="rgba(255,255,255,.5)"/>
+                <circle cx="70"  cy="150" r="0.8" fill="rgba(255,255,255,.3)"/>
+                <circle cx="310" cy="130" r="1.1" fill="rgba(255,255,255,.45)"/>
+                <circle cx="160" cy="120" r="0.6" fill="rgba(255,255,255,.35)"/>
+                <circle cx="250" cy="160" r="0.9" fill="rgba(255,255,255,.4)"/>
+                <circle cx="90"  cy="200" r="0.7" fill="rgba(255,255,255,.3)"/>
+                <circle cx="355" cy="185" r="1"   fill="rgba(255,255,255,.4)"/>
+                <circle cx="35"  cy="240" r="0.8" fill="rgba(255,255,255,.35)"/>
+                <circle cx="185" cy="220" r="0.6" fill="rgba(255,255,255,.3)"/>
+                <!-- Moon glow -->
+                <circle cx="330" cy="72" r="18" fill="rgba(200,240,255,.07)"/>
+                <circle cx="330" cy="72" r="12" fill="rgba(200,240,255,.06)"/>
+                <circle cx="330" cy="72" r="7"  fill="rgba(220,248,255,.1)"/>
+            </svg>
+
+            <!-- Water ripple bottom -->
+            <svg class="water-ripple" viewBox="0 0 390 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="rgba(14,116,144,0)" />
+                        <stop offset="40%" stop-color="rgba(14,116,144,.08)" />
+                        <stop offset="100%" stop-color="rgba(14,116,144,.18)" />
+                    </linearGradient>
+                </defs>
+                <rect width="390" height="120" fill="url(#waterGrad)"/>
+                <path d="M0 40 Q48 28 97 40 Q146 52 195 40 Q244 28 293 40 Q342 52 390 40 L390 120 L0 120Z"
+                      fill="rgba(14,116,144,.08)"/>
+                <path d="M0 60 Q60 48 120 60 Q180 72 240 60 Q300 48 390 60 L390 120 L0 120Z"
+                      fill="rgba(14,116,144,.06)"/>
+                <path d="M0 80 Q50 70 100 80 Q150 90 200 80 Q250 70 300 80 Q350 90 390 80 L390 120 L0 120Z"
+                      fill="rgba(14,116,144,.05)"/>
+            </svg>
+
+            <!-- Status bar -->
+            <div class="status-bar">
+                <span class="time">20:00</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <rect x="0" y="8" width="3" height="4" rx="0.5"/>
+                        <rect x="4" y="5" width="3" height="7" rx="0.5"/>
+                        <rect x="8" y="2" width="3" height="10" rx="0.5"/>
+                        <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35"/>
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z"/>
+                        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="rgba(255,255,255,.65)" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                        <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="rgba(255,255,255,.65)" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                    </svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12">
+                        <rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.65)" stroke-width="1.2" fill="none"/>
+                        <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="rgba(255,255,255,.5)" opacity="0.6"/>
+                        <rect x="1.5" y="2.5" width="11" height="7" rx="1.2" fill="rgba(255,255,255,.65)"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Scrollable body -->
+            <div class="screen-body">
+
+                <!-- HERO -->
+                <div class="hero">
+                    <!-- Fishing rod SVG icon -->
+                    <div class="logo-icon">
+                        <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Glow circle -->
+                            <circle cx="30" cy="30" r="28" fill="rgba(14,116,144,.15)" stroke="rgba(34,211,238,.15)" stroke-width="1"/>
+                            <!-- Fishing rod: handle -->
+                            <rect x="10" y="43" width="24" height="5" rx="2.5" fill="rgba(120,90,60,.8)"/>
+                            <!-- Reel -->
+                            <circle cx="22" cy="40" r="5" fill="rgba(80,80,90,.7)" stroke="rgba(150,150,160,.4)" stroke-width="1"/>
+                            <circle cx="22" cy="40" r="2.5" fill="rgba(40,40,50,.8)"/>
+                            <!-- Rod blank (long diagonal) -->
+                            <line x1="13" y1="43" x2="48" y2="14" stroke="rgba(200,180,140,.75)" stroke-width="2.5" stroke-linecap="round"/>
+                            <!-- Rod tip ring -->
+                            <circle cx="48" cy="14" r="2" fill="none" stroke="rgba(200,180,140,.6)" stroke-width="1.5"/>
+                            <!-- Fishing line -->
+                            <path d="M48 14 Q54 20 50 30 Q47 38 44 44" stroke="rgba(34,211,238,.6)" stroke-width="1" fill="none" stroke-linecap="round"/>
+                            <!-- Hook suggestion -->
+                            <circle cx="44" cy="46" r="2" fill="none" stroke="rgba(34,211,238,.5)" stroke-width="1.5"/>
+                            <!-- Water drops / ripple at bottom -->
+                            <ellipse cx="42" cy="50" rx="5" ry="1.5" fill="none" stroke="rgba(34,211,238,.25)" stroke-width="1"/>
+                            <ellipse cx="42" cy="50" rx="8" ry="2.5" fill="none" stroke="rgba(34,211,238,.15)" stroke-width="1"/>
+                        </svg>
+                    </div>
+
+                    <div class="app-name">SIEDZI<span class="accent">!</span></div>
+                    <div class="tagline-row">
+                        <div class="tagline-line"></div>
+                        <span class="tagline">Dziennik Połowów</span>
+                        <div class="tagline-line right"></div>
+                    </div>
+                </div>
+
+                <!-- HERO STATS -->
+                <div class="hero-stats">
+                    <div class="hstat">
+                        <span class="hstat-val">3 sek</span>
+                        <span class="hstat-lbl">Rejestracja połowu</span>
+                    </div>
+                    <div class="hstat">
+                        <span class="hstat-val">100%</span>
+                        <span class="hstat-lbl">Offline-first</span>
+                    </div>
+                    <div class="hstat">
+                        <span class="hstat-val">Auto</span>
+                        <span class="hstat-lbl">GPS · Pogoda · Solunar</span>
+                    </div>
+                </div>
+
+                <!-- VALUE CARDS -->
+                <div class="value-cards">
+
+                    <!-- Card 1: Speed -->
+                    <div class="value-card teal">
+                        <div class="vc-icon">
+                            <span class="material-icons-outlined">bolt</span>
+                        </div>
+                        <div class="vc-texts">
+                            <div class="vc-title">Połów zarejestrowany w 3 sekundy</div>
+                            <div class="vc-desc">Zdjęcie → gatunek i waga → Zapisz. GPS, czas, pogoda i zestaw wędki dodają się automatycznie.</div>
+                            <div class="vc-tag">
+                                <span class="material-icons-outlined" style="font-size:10px;width:10px;height:10px;line-height:10px;overflow:hidden;">camera_alt</span>
+                                Karta połowu
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Offline -->
+                    <div class="value-card green">
+                        <div class="vc-icon">
+                            <span class="material-icons-outlined">wifi_off</span>
+                        </div>
+                        <div class="vc-texts">
+                            <div class="vc-title">Offline. Zawsze gotowy</div>
+                            <div class="vc-desc">Sesja, oś czasu i mapy topograficzne działają bez zasięgu. Synchronizacja z Drive po powrocie do cywilizacji.</div>
+                            <div class="vc-tag">
+                                <span class="material-icons-outlined" style="font-size:10px;width:10px;height:10px;line-height:10px;overflow:hidden;">map</span>
+                                Mapy topo offline
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Solunar -->
+                    <div class="value-card amber">
+                        <div class="vc-icon">
+                            <span class="material-icons-outlined">wb_twilight</span>
+                        </div>
+                        <div class="vc-texts">
+                            <div class="vc-title">Solunar i historia decydują</div>
+                            <div class="vc-desc">Najlepsze godziny połowów + porównanie warunków z poprzednimi wyjazdami. Wyjeżdżaj kiedy ryba bierze.</div>
+                            <div class="vc-tag">
+                                <span class="material-icons-outlined" style="font-size:10px;width:10px;height:10px;line-height:10px;overflow:hidden;">auto_graph</span>
+                                Analityk wyprawy
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FEATURE PILLS -->
+                <p class="pills-label">A&nbsp;do&nbsp;tego</p>
+                <div class="pills-row">
+                    <div class="feature-pill">
+                        <span class="material-icons-outlined">photo_library</span>
+                        Galeria prywatna
+                    </div>
+                    <div class="feature-pill">
+                        <span class="material-icons-outlined">history</span>
+                        Historia wyjazdów
+                    </div>
+                    <div class="feature-pill">
+                        <span class="material-icons-outlined">share</span>
+                        Auto-opis na IG
+                    </div>
+                    <div class="feature-pill">
+                        <span class="material-icons-outlined">cloud_done</span>
+                        Backup Drive
+                    </div>
+                </div>
+
+                <!-- STEP DOTS -->
+                <div class="step-dots" style="margin-bottom: 6px;">
+                    <div class="step-dot active"></div>
+                    <div class="step-dot"></div>
+                    <div class="step-dot"></div>
+                </div>
+
+                <div class="flex-grow"></div>
+            </div>
+
+            <!-- CTA AREA (fixed at bottom) -->
+            <div class="cta-area">
+                <div class="cta-onboarding">
+                    <!-- Fishing rod inline SVG icon in box -->
+                    <div class="cta-rod-icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <line x1="3" y1="16" x2="17" y2="4" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+                            <path d="M17 4 Q19 7 17 11" stroke="rgba(34,211,238,.8)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                            <circle cx="17" cy="13" r="1.5" fill="none" stroke="rgba(34,211,238,.7)" stroke-width="1.2"/>
+                        </svg>
+                    </div>
+                    <span class="cta-onboarding-text">Zaczynamy!</span>
+                    <div class="cta-arrow-circle">
+                        <span class="material-icons-outlined">arrow_forward</span>
+                    </div>
+                </div>
+                <span class="skip-link">Pomiń — przejdź od razu do aplikacji</span>
+            </div>
+
+            <!-- No nav bar — onboarding has no navigation bar -->
+        </div>
+        <p class="phone-meta">390×844 · Ekran 24 · Onboarding: Witaj w SIEDZI!</p>
+    </div>
+
+    <script>
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 60;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+</body>
+</html>

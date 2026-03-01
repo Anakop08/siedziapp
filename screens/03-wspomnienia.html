@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 03 Wspomnienia i Sukcesy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            background: #0d0a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #0e0814;
+            border-radius: 52px;
+            box-shadow:
+                0 0 0 2px #2a2a2e,
+                0 0 0 5px #1a1a1e,
+                0 30px 80px rgba(0, 0, 0, 0.85),
+                inset 0 0 0 1px #2e2e35;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 140px;
+            width: 3px;
+            height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px;
+            top: 120px;
+            width: 3px;
+            height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .status-bar .time {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0;
+            letter-spacing: 0.2px;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .status-icons svg {
+            fill: #e0e0e0;
+        }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            padding: 6px 8px 6px 4px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #0e0814;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 5;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+        }
+
+        .back-btn .material-icons-outlined {
+            font-size: 22px;
+        }
+
+        .top-bar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .top-bar-title span {
+            color: #a78bfa;
+        }
+
+        /* ── Scrollable body ── */
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+        }
+
+        .screen-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* ── Hero / Motivational Banner ── */
+        .hero-banner {
+            margin: 10px 16px 16px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            height: 100px;
+            background: linear-gradient(135deg, #1e0845 0%, #2d1171 50%, #3b0f8c 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 16px;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 80% at 80% 50%, rgba(167, 139, 250, 0.15) 0%, transparent 70%);
+        }
+
+        .hero-icon {
+            font-size: 40px;
+            filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.5));
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .hero-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-label {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(167, 139, 250, 0.7);
+        }
+
+        .hero-title {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .hero-stat {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        .hero-stat strong {
+            color: #c4b5fd;
+        }
+
+        /* ── Section title ── */
+        .section-title {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            padding: 0 20px;
+            margin-bottom: 10px;
+        }
+
+        /* ── Trip Cards (list) ── */
+        .trip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0 16px;
+            margin-bottom: 20px;
+        }
+
+        .trip-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .trip-card:active {
+            transform: scale(0.98);
+        }
+
+        .trip-thumb {
+            width: 80px;
+            flex-shrink: 0;
+            background: linear-gradient(160deg, #1a0940, #0e1a30);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 10px 6px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .trip-thumb-map {
+            width: 52px;
+            height: 44px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #0c2e1a, #0a3d28);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Topographic lines decoration */
+        .trip-thumb-map::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 4px,
+                    rgba(16, 185, 129, 0.08) 4px,
+                    rgba(16, 185, 129, 0.08) 5px);
+        }
+
+        .trip-thumb-date {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.2px;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .trip-info {
+            flex: 1;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .trip-fishery {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .trip-catches {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .catch-pill {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .catch-pill.highlight {
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .trip-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trip-weight {
+            font-size: 12px;
+            font-weight: 600;
+            color: #a78bfa;
+        }
+
+        .trip-duration {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .trip-chevron {
+            margin-left: auto;
+            color: rgba(139, 92, 246, 0.5);
+            font-size: 18px;
+        }
+
+        /* ── Main Stats ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            padding: 0 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            border-radius: 16px;
+            padding: 12px 10px;
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .stat-val {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .stat-lbl {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
+
+        /* ── Gallery strip ── */
+        .gallery-strip-wrap {
+            margin-bottom: 20px;
+        }
+
+        .gallery-strip-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            margin-bottom: 10px;
+        }
+
+        .gallery-strip-see-all {
+            font-size: 11px;
+            font-weight: 500;
+            color: #a78bfa;
+            letter-spacing: 0.3px;
+        }
+
+        .gallery-strip {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .gallery-strip::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gallery-thumb {
+            width: 72px;
+            height: 72px;
+            border-radius: 14px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #1a0940, #0e1a30);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .gallery-thumb::after {
+            content: attr(data-weight);
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 9px;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.55);
+            padding: 2px 0;
+        }
+
+        /* Record card gold border */
+        .gallery-thumb.record {
+            border: 1.5px solid rgba(251, 191, 36, 0.6);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.15);
+        }
+
+        .record-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-size: 11px;
+        }
+
+        /* ── Session Banner ── */
+        .session-banner {
+            margin: 4px 16px 0;
+            background: rgba(14, 116, 144, 0.18);
+            border: 1px solid rgba(34, 211, 238, 0.4);
+            border-radius: 14px;
+            padding: 9px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .session-banner-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22d3ee;
+            box-shadow: 0 0 8px rgba(34, 211, 238, 0.9);
+            animation: pulse 1.8s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+        }
+
+        .session-banner-text {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .session-banner-time {
+            font-size: 12px;
+            color: #22d3ee;
+            font-weight: 600;
+        }
+
+        .session-banner-chevron {
+            font-size: 18px;
+            color: rgba(34, 211, 238, 0.7);
+        }
+
+        /* ── Nav Bar ── */
+        .nav-bar {
+            height: 34px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-pill {
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.27);
+            border-radius: 2px;
+        }
+
+        .phone-meta {
+            color: #444;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <p class="screen-label">SIEDZI! · Ekran 03 / 26 · Wspomnienia i Sukcesy</p>
+
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+
+            <div class="dynamic-island"></div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span class="time">16:05</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <rect x="0" y="8" width="3" height="4" rx="0.5" />
+                        <rect x="4" y="5" width="3" height="7" rx="0.5" />
+                        <rect x="8" y="2" width="3" height="10" rx="0.5" />
+                        <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35" />
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z" />
+                        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                            stroke-linecap="round" />
+                        <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                            stroke-linecap="round" />
+                    </svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12">
+                        <rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2"
+                            fill="none" />
+                        <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6" />
+                        <rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="back-btn">
+                    <span class="material-icons-outlined">arrow_back</span>
+                </div>
+                <div class="top-bar-title">Wspomnienia <span>&</span> Sukcesy</div>
+            </div>
+
+            <!-- Screen body -->
+            <div class="screen-body">
+
+                <!-- Hero motivational banner -->
+                <div class="hero-banner">
+                    <div class="hero-icon">🏆</div>
+                    <div class="hero-text">
+                        <div class="hero-label">Twój dorobek</div>
+                        <div class="hero-title">34 wyprawy na wodę</div>
+                        <div class="hero-stat">Łącznie złowione <strong>218.4 kg</strong> ryb</div>
+                    </div>
+                </div>
+
+                <!-- Quick stats -->
+                <div class="section-title">Statystyki Ogólne</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎣</div>
+                        <div class="stat-val">147</div>
+                        <div class="stat-lbl">Połowów</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱</div>
+                        <div class="stat-val">312h</div>
+                        <div class="stat-lbl">Nad wodą</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📍</div>
+                        <div class="stat-val">8</div>
+                        <div class="stat-lbl">Łowisk</div>
+                    </div>
+                </div>
+
+                <!-- Gallery strip -->
+                <div class="gallery-strip-wrap">
+                    <div class="gallery-strip-header">
+                        <div class="section-title" style="margin:0;padding:0">Galeria Zdobyczy</div>
+                        <div class="gallery-strip-see-all">Zobacz wszystkie</div>
+                    </div>
+                    <div class="gallery-strip">
+                        <!-- Record fish -->
+                        <div class="gallery-thumb record" data-weight="14.2 kg">
+                            🐟
+                            <span class="record-badge">🥇</span>
+                        </div>
+                        <div class="gallery-thumb" data-weight="8.7 kg">🐟</div>
+                        <div class="gallery-thumb" data-weight="6.1 kg">🐡</div>
+                        <div class="gallery-thumb" data-weight="5.3 kg">🐟</div>
+                        <div class="gallery-thumb" data-weight="4.8 kg">🐠</div>
+                        <div class="gallery-thumb" data-weight="3.9 kg">🐡</div>
+                    </div>
+                </div>
+
+                <!-- Trip list -->
+                <div class="section-title">Historia Wypraw</div>
+                <div class="trip-list">
+
+                    <!-- Trip 1 -->
+                    <div class="trip-card">
+                        <div class="trip-thumb">
+                            <div class="trip-thumb-map">🌲</div>
+                            <div class="trip-thumb-date">15 Feb<br>2026</div>
+                        </div>
+                        <div class="trip-info">
+                            <div class="trip-fishery">Jezioro Białe – St. 3</div>
+                            <div class="trip-catches">
+                                <span class="catch-pill">🐟 3× Karp</span>
+                                <span class="catch-pill">🐡 2× Karaś</span>
+                            </div>
+                            <div class="trip-meta-row">
+                                <div class="trip-weight">14.8 kg</div>
+                                <div class="trip-duration">· 9h 20min</div>
+                                <span class="material-icons-outlined trip-chevron">chevron_right</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trip 2 – record -->
+                    <div class="trip-card" style="border-color: rgba(251,191,36,0.3);">
+                        <div class="trip-thumb" style="background: linear-gradient(160deg, #2a1a00, #1a1200);">
+                            <div class="trip-thumb-map" style="background: linear-gradient(135deg, #2a1a00, #1a0e00);">
+                                🏔️</div>
+                            <div class="trip-thumb-date">8 Sty<br>2026</div>
+                        </div>
+                        <div class="trip-info">
+                            <div class="trip-fishery">Zbiornik Zegrzyński</div>
+                            <div class="trip-catches">
+                                <span class="catch-pill highlight">🥇 Rekord: Karp 14.2 kg</span>
+                            </div>
+                            <div class="trip-meta-row">
+                                <div class="trip-weight" style="color:#fbbf24;">22.1 kg</div>
+                                <div class="trip-duration">· 11h 05min</div>
+                                <span class="material-icons-outlined trip-chevron"
+                                    style="color:rgba(251,191,36,0.5)">chevron_right</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trip 3 -->
+                    <div class="trip-card">
+                        <div class="trip-thumb">
+                            <div class="trip-thumb-map">🌾</div>
+                            <div class="trip-thumb-date">22 Lis<br>2025</div>
+                        </div>
+                        <div class="trip-info">
+                            <div class="trip-fishery">Stawy Rybna – St. 1</div>
+                            <div class="trip-catches">
+                                <span class="catch-pill">🐠 4× Lin</span>
+                                <span class="catch-pill">🐡 1× Karaś</span>
+                            </div>
+                            <div class="trip-meta-row">
+                                <div class="trip-weight">12.3 kg</div>
+                                <div class="trip-duration">· 7h 45min</div>
+                                <span class="material-icons-outlined trip-chevron">chevron_right</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- bottom spacer -->
+                <div style="height: 6px;"></div>
+
+            </div><!-- /.screen-body -->
+
+            <!-- Active Session Banner -->
+            <div class="session-banner">
+                <div class="session-banner-dot"></div>
+                <div class="session-banner-text">Sesja aktywna &ndash; Jezioro Czarne</div>
+                <div class="session-banner-time">4h 17min</div>
+                <span class="material-icons-outlined session-banner-chevron">chevron_right</span>
+            </div>
+
+            <!-- Nav Bar -->
+            <div class="nav-bar">
+                <div class="nav-pill"></div>
+            </div>
+
+        </div><!-- /.phone -->
+
+        <p class="phone-meta">390 × 844 · Android · MD3 Dark · Wspomnienia i Sukcesy</p>
+    </div><!-- /.phone-wrap -->
+
+    <script>
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 60;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 08 Dzień Wyjazdu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <script src="weather-icons.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            overflow: hidden;
+            height: 100%
+        }
+
+        body {
+            background: #060f0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center
+        }
+
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #080f0a;
+            border-radius: 52px;
+            box-shadow: 0 0 0 2px #2a2e2a, 0 0 0 5px #1a1e1a,
+                0 30px 80px rgba(0, 0, 0, .85), inset 0 0 0 1px #2e3530;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 140px;
+            width: 3px;
+            height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px;
+            top: 120px;
+            width: 3px;
+            height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20
+        }
+
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10
+        }
+
+        .status-bar .time {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center
+        }
+
+        .status-icons svg {
+            fill: #e0e0e0
+        }
+
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none
+        }
+
+        .screen-body::-webkit-scrollbar {
+            display: none
+        }
+
+        /* Top bar */
+        .top-bar {
+            padding: 6px 8px 8px 4px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #080f0a
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.6)
+        }
+
+        .top-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff
+        }
+
+        .top-title span {
+            color: #34d399
+        }
+
+        /* Hero banner – wyprawa */
+        .hero-trip {
+            margin: 0 16px 16px;
+            background: linear-gradient(145deg, rgba(6, 95, 70, .5), rgba(4, 55, 40, .4));
+            border: 1px solid rgba(52, 211, 153, .22);
+            border-radius: 20px;
+            padding: 14px 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-trip::before {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: -20px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(52, 211, 153, .12) 0%, transparent 70%);
+        }
+
+        .hero-date-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(52, 211, 153, .15);
+            border: 1px solid rgba(52, 211, 153, .3);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #34d399;
+            margin-bottom: 8px;
+        }
+
+        .hero-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #34d399;
+            animation: pulse 1.5s ease-in-out infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: .5;
+                transform: scale(1.3)
+            }
+        }
+
+        .hero-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 3px
+        }
+
+        .hero-sub {
+            font-size: 12px;
+            color: rgba(255, 255, 255, .45)
+        }
+
+        .hero-chips {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap
+        }
+
+        .hero-chip {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, .6);
+        }
+
+        .hero-chip svg {
+            flex-shrink: 0
+        }
+
+        /* Section label */
+        .sect-label {
+            padding: 0 16px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .3);
+        }
+
+        /* === SEKCJA A: ODŚWIEŻ DANE === */
+        .refresh-card {
+            margin: 0 16px 16px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .refresh-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 14px;
+            position: relative;
+        }
+
+        .refresh-row+.refresh-row {
+            border-top: 1px solid rgba(255, 255, 255, .05)
+        }
+
+        /* Icon box */
+        .refresh-icon-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .refresh-icon-box.weather {
+            background: rgba(96, 165, 250, .12);
+            border: 1px solid rgba(96, 165, 250, .2)
+        }
+
+        .refresh-icon-box.solunar {
+            background: rgba(251, 191, 36, .1);
+            border: 1px solid rgba(251, 191, 36, .2)
+        }
+
+        .refresh-icon-box.backup {
+            background: rgba(52, 211, 153, .1);
+            border: 1px solid rgba(52, 211, 153, .2)
+        }
+
+        .refresh-text {
+            flex: 1
+        }
+
+        .refresh-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 2px
+        }
+
+        .refresh-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .4)
+        }
+
+        /* Status badges */
+        .refresh-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-ok {
+            color: #34d399;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-ok::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #34d399
+        }
+
+        .status-old {
+            color: #fbbf24;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-old::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #fbbf24
+        }
+
+        .status-loading {
+            color: rgba(255, 255, 255, .3);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, .15);
+            border-top-color: #34d399;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* Refresh button for old data */
+        .btn-refresh {
+            margin-left: 4px;
+            padding: 4px 10px;
+            border-radius: 10px;
+            background: rgba(251, 191, 36, .15);
+            border: 1px solid rgba(251, 191, 36, .3);
+            font-size: 11px;
+            font-weight: 600;
+            color: #fbbf24;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* === SEKCJA B: POBIERZ MAPY === */
+        .map-card {
+            margin: 0 16px 16px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        /* Map preview strip */
+        .map-preview {
+            height: 90px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-preview-svg {
+            width: 100%;
+            height: 100%;
+            display: block
+        }
+
+        .map-preview-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 40%, rgba(8, 15, 10, 1));
+        }
+
+        .map-preview-label {
+            position: absolute;
+            bottom: 8px;
+            left: 14px;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .5);
+        }
+
+        .map-types {
+            display: flex;
+            flex-direction: column;
+            padding: 2px 0
+        }
+
+        .map-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            gap: 12px;
+        }
+
+        .map-row+.map-row {
+            border-top: 1px solid rgba(255, 255, 255, .05)
+        }
+
+        .map-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .map-icon.standard {
+            background: rgba(147, 197, 253, .1);
+            border: 1px solid rgba(147, 197, 253, .2)
+        }
+
+        .map-icon.topo {
+            background: rgba(52, 211, 153, .1);
+            border: 1px solid rgba(52, 211, 153, .2)
+        }
+
+        .map-icon.satellite {
+            background: rgba(251, 191, 36, .08);
+            border: 1px solid rgba(251, 191, 36, .2)
+        }
+
+        .map-text {
+            flex: 1
+        }
+
+        .map-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 1px
+        }
+
+        .map-size {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .35)
+        }
+
+        /* Download state */
+        .dl-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(52, 211, 153, .12);
+            border: 1px solid rgba(52, 211, 153, .3);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .dl-done {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(52, 211, 153, .2);
+        }
+
+        .dl-progress {
+            width: 32px;
+            height: 32px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .dl-progress svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%
+        }
+
+        /* Storage note */
+        .storage-note {
+            margin: 0 16px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(251, 191, 36, .05);
+            border: 1px solid rgba(251, 191, 36, .15);
+            border-radius: 14px;
+        }
+
+        .storage-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+
+        .storage-text {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .4);
+            line-height: 1.5
+        }
+
+        .storage-text strong {
+            color: rgba(251, 191, 36, .7);
+            font-weight: 500
+        }
+
+        /* Quick weather summary strip */
+        .wx-strip {
+            margin: 0 16px 16px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .wx-day-card {
+            flex: 1;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 14px;
+            padding: 8px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .wx-day-card.active {
+            background: rgba(52, 211, 153, .07);
+            border-color: rgba(52, 211, 153, .25);
+        }
+
+        .wx-day-name {
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, .4);
+            text-transform: uppercase
+        }
+
+        .wx-day-name.active {
+            color: #34d399
+        }
+
+        .wx-day-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .wx-day-temp {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff
+        }
+
+        .wx-day-wind {
+            font-size: 9px;
+            color: rgba(255, 255, 255, .3)
+        }
+
+        /* CTA bottom */
+        .cta-wrap {
+            padding: 8px 16px 6px
+        }
+
+        .cta-btn {
+            background: linear-gradient(135deg, #059669, #047857);
+            border-radius: 16px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(5, 150, 105, .35);
+            transition: transform .15s;
+        }
+
+        .cta-btn:active {
+            transform: scale(.98)
+        }
+
+        .cta-left {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .cta-car-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cta-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff
+        }
+
+        .cta-sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .65);
+            margin-top: 1px
+        }
+
+        .cta-arrow {
+            font-size: 24px;
+            color: rgba(255, 255, 255, .8)
+        }
+
+        .nav-bar {
+            height: 34px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, .3)
+        }
+
+        .nav-pill {
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, .27);
+            border-radius: 2px
+        }
+
+        .phone-meta {
+            color: #444;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px
+        }
+    </style>
+</head>
+
+<body>
+    <p class="screen-label">SIEDZI! · Ekran 08 / 26 · Dzień Wyjazdu</p>
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+            <div class="dynamic-island"></div>
+
+            <!-- Status bar -->
+            <div class="status-bar">
+                <span class="time">07:14</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <rect x="0" y="8" width="3" height="4" rx="0.5" />
+                        <rect x="4" y="5" width="3" height="7" rx="0.5" />
+                        <rect x="8" y="2" width="3" height="10" rx="0.5" />
+                        <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35" />
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1" fill="#e0e0e0" />
+                        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                            stroke-linecap="round" />
+                        <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                            stroke-linecap="round" />
+                    </svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12">
+                        <rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2"
+                            fill="none" />
+                        <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6" />
+                        <rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="screen-body">
+
+                <!-- Top bar -->
+                <div class="top-bar">
+                    <div class="back-btn"><span class="material-icons-outlined">arrow_back</span></div>
+                    <div class="top-title">Dzień <span>Wyjazdu</span></div>
+                </div>
+
+                <!-- Hero: wyprawa summary -->
+                <div class="hero-trip">
+                    <div class="hero-date-badge">
+                        <div class="hero-dot"></div>
+                        Dziś · Piątek 20 marca 2026
+                    </div>
+                    <div class="hero-title">Jezioro Białe · Mazury</div>
+                    <div class="hero-sub">4 dni · pow. giżycki · wyjazd z Warszawy</div>
+                    <div class="hero-chips">
+                        <div class="hero-chip">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.5)" stroke-width="2" />
+                                <polyline points="12,6 12,12 16,14" stroke="rgba(255,255,255,0.5)" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            3 godziny drogi
+                        </div>
+                        <div class="hero-chip">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="rgba(255,255,255,0.5)"
+                                    stroke-width="2" stroke-linecap="round" />
+                                <circle cx="9" cy="7" r="4" stroke="rgba(255,255,255,0.5)" stroke-width="2" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="rgba(255,255,255,0.5)" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="rgba(255,255,255,0.5)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                            2 osoby
+                        </div>
+                        <div class="hero-chip">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="rgba(255,255,255,0.5)"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            Kwatera: Dom Wędkarza
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick weather strip for 4 days -->
+                <div class="sect-label">Prognoza na Wyprawę</div>
+                <div class="wx-strip">
+                    <div class="wx-day-card active">
+                        <div class="wx-day-name active">Dziś</div>
+                        <div class="wx-day-icon" data-weather-icon="partly-cloudy-day" data-size="24"></div>
+                        <div class="wx-day-temp">5°C</div>
+                        <div class="wx-day-wind">8 km/h</div>
+                    </div>
+                    <div class="wx-day-card">
+                        <div class="wx-day-name">So</div>
+                        <div class="wx-day-icon" data-weather-icon="clear-day" data-size="24"></div>
+                        <div class="wx-day-temp">8°C</div>
+                        <div class="wx-day-wind">5 km/h</div>
+                    </div>
+                    <div class="wx-day-card">
+                        <div class="wx-day-name">Nd</div>
+                        <div class="wx-day-icon" data-weather-icon="drizzle" data-size="24"></div>
+                        <div class="wx-day-temp">6°C</div>
+                        <div class="wx-day-wind">12 km/h</div>
+                    </div>
+                    <div class="wx-day-card">
+                        <div class="wx-day-name">Pn</div>
+                        <div class="wx-day-icon" data-weather-icon="rain" data-size="24"></div>
+                        <div class="wx-day-temp">4°C</div>
+                        <div class="wx-day-wind">18 km/h</div>
+                    </div>
+                </div>
+
+                <!-- === SECTION A: ODŚWIEŻ DANE === -->
+                <div class="sect-label">A · Odśwież Dane</div>
+                <div class="refresh-card">
+
+                    <!-- Pogoda – done -->
+                    <div class="refresh-row">
+                        <div class="refresh-icon-box weather">
+                            <svg width="20" height="20" viewBox="0 0 30 30" fill="none">
+                                <circle cx="11" cy="9.5" r="4" fill="#fbbf24" opacity="0.9" />
+                                <line x1="11" y1="2" x2="11" y2="4" stroke="#fbbf24" stroke-width="1.5"
+                                    stroke-linecap="round" />
+                                <line x1="4" y1="9.5" x2="6" y2="9.5" stroke="#fbbf24" stroke-width="1.5"
+                                    stroke-linecap="round" />
+                                <line x1="5.5" y1="5" x2="6.9" y2="6.4" stroke="#fbbf24" stroke-width="1.3"
+                                    stroke-linecap="round" />
+                                <path
+                                    d="M8 22 C8 22 6.8 22 5.8 21.4 C3.8 20.3 3.8 17.5 5.8 16.3 C6.6 15.8 7.8 15.6 8.9 16.1 C9.5 14.2 11.1 13 13.5 13.5 C15.5 13.9 17 15.5 17 17.5 C17.6 17.5 18.5 17.8 19 18.4 C20.1 19.7 19.5 21.8 17.6 22.5 L8 22Z"
+                                    fill="#93c5fd" opacity="0.85" />
+                            </svg>
+                        </div>
+                        <div class="refresh-text">
+                            <div class="refresh-name">Aktualna Pogoda</div>
+                            <div class="refresh-desc">Prognoza 4-dniowa · ciśnienie · wiatr</div>
+                        </div>
+                        <div class="refresh-status">
+                            <div class="status-ok">Pobrano</div>
+                        </div>
+                    </div>
+
+                    <!-- Solunar – stale, needs refresh -->
+                    <div class="refresh-row">
+                        <div class="refresh-icon-box solunar">
+                            <svg width="20" height="20" viewBox="0 0 30 30" fill="none">
+                                <path
+                                    d="M22 16C18.6 16 16 13.4 16 10C16 7.8 17.1 5.8 18.8 4.6C14.2 3.9 10 7.9 10 13C10 18.5 14.5 23 20 23C23.2 23 26.1 21.5 28 19C26.1 19.7 24.1 16 22 16Z"
+                                    fill="#a78bfa" opacity="0.85" />
+                                <circle cx="23" cy="7" r="1" fill="#fde68a" opacity="0.7" />
+                                <circle cx="26" cy="4.5" r="0.7" fill="#fde68a" opacity="0.5" />
+                                <circle cx="21" cy="3.5" r="0.6" fill="#fde68a" opacity="0.5" />
+                            </svg>
+                        </div>
+                        <div class="refresh-text">
+                            <div class="refresh-name">Solunar i Gwiazdy</div>
+                            <div class="refresh-desc">Ostatnia aktualizacja 2 dni temu</div>
+                        </div>
+                        <div class="refresh-status">
+                            <div class="btn-refresh">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                    <path d="M1 4v6h6" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path d="M3.51 15a9 9 0 1 0 .49-3.33" stroke="#fbbf24" stroke-width="2.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                Odśwież
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backup – in progress -->
+                    <div class="refresh-row">
+                        <div class="refresh-icon-box backup">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <polyline points="16,16 12,12 8,16" stroke="#34d399" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <line x1="12" y1="12" x2="12" y2="21" stroke="#34d399" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" stroke="#34d399"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="refresh-text">
+                            <div class="refresh-name">Kopia Zapasowa Google Drive</div>
+                            <div class="refresh-desc">Synchronizuję dane… 47 MB</div>
+                        </div>
+                        <div class="refresh-status status-loading">
+                            <div class="spinner"></div>
+                            68%
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- === SECTION B: POBIERZ MAPY === -->
+                <div class="sect-label">B · Pobierz Mapy Offline</div>
+                <div class="map-card">
+
+                    <!-- Map topo preview -->
+                    <div class="map-preview">
+                        <svg class="map-preview-svg" viewBox="0 0 358 90" preserveAspectRatio="xMidYMid slice"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <rect width="358" height="90" fill="#0d1f16" />
+                            <!-- Topo lines – lake shape -->
+                            <ellipse cx="179" cy="55" rx="80" ry="38" stroke="rgba(52,211,153,0.25)" stroke-width="1"
+                                fill="rgba(52,211,153,0.04)" />
+                            <ellipse cx="179" cy="55" rx="65" ry="28" stroke="rgba(52,211,153,0.2)" stroke-width="1"
+                                fill="rgba(52,211,153,0.06)" />
+                            <ellipse cx="179" cy="55" rx="50" ry="20" stroke="rgba(52,211,153,0.15)" stroke-width="1"
+                                fill="rgba(52,211,153,0.08)" />
+                            <ellipse cx="179" cy="55" rx="35" ry="12" stroke="rgba(52,211,153,0.12)" stroke-width="1"
+                                fill="rgba(52,211,153,0.12)" />
+                            <ellipse cx="179" cy="55" rx="20" ry="6" fill="rgba(52,211,153,0.2)" />
+                            <!-- terrain lines -->
+                            <path d="M20,20 Q60,10 100,25 Q140,40 180,20 Q220,5 260,15 Q300,25 340,10"
+                                stroke="rgba(52,211,153,0.12)" stroke-width="1" fill="none" />
+                            <path d="M10,35 Q50,25 90,40 Q130,55 170,35 Q210,15 250,30 Q290,45 340,25"
+                                stroke="rgba(52,211,153,0.1)" stroke-width="1" fill="none" />
+                            <!-- road-like lines -->
+                            <path d="M30,70 L80,60 L140,65 L180,55 L220,65 L280,60 L340,70"
+                                stroke="rgba(255,255,255,0.08)" stroke-width="1.5" fill="none" />
+                            <path d="M179,90 L179,55" stroke="rgba(255,255,255,0.06)" stroke-width="1" fill="none"
+                                stroke-dasharray="3 3" />
+                            <!-- GPS pin -->
+                            <circle cx="210" cy="48" r="5" fill="rgba(52,211,153,0.8)" />
+                            <circle cx="210" cy="48" r="9" stroke="rgba(52,211,153,0.35)" stroke-width="1.5"
+                                fill="none" />
+                        </svg>
+                        <div class="map-preview-overlay"></div>
+                        <div class="map-preview-label">Jezioro Białe · Podgląd obszaru</div>
+                    </div>
+
+                    <div class="map-types">
+                        <!-- Mapa standardowa – downloaded -->
+                        <div class="map-row">
+                            <div class="map-icon standard">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2" stroke="#93c5fd"
+                                        stroke-width="1.8" stroke-linejoin="round" fill="none" />
+                                    <line x1="8" y1="2" x2="8" y2="18" stroke="#93c5fd" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                    <line x1="16" y1="6" x2="16" y2="22" stroke="#93c5fd" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                            </div>
+                            <div class="map-text">
+                                <div class="map-name">Mapa Standardowa</div>
+                                <div class="map-size">23.4 MB · obszar 15×15 km</div>
+                            </div>
+                            <div class="dl-done">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17l-5-5" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Mapa topograficzna – downloading -->
+                        <div class="map-row">
+                            <div class="map-icon topo">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path d="M3 20c2-4 4-8 7-8s5 4 7 0" stroke="#34d399" stroke-width="1.8"
+                                        stroke-linecap="round" fill="none" />
+                                    <path d="M1 14c2-5 5-10 9-10s7 5 9 10" stroke="#34d399" stroke-width="1.5"
+                                        stroke-linecap="round" fill="none" opacity="0.6" />
+                                    <line x1="12" y1="4" x2="12" y2="2" stroke="#34d399" stroke-width="1.5"
+                                        stroke-linecap="round" opacity="0.4" />
+                                </svg>
+                            </div>
+                            <div class="map-text">
+                                <div class="map-name">Mapa Topograficzna</div>
+                                <div class="map-size">Pobieranie… 38.1 MB</div>
+                            </div>
+                            <div class="dl-progress">
+                                <svg viewBox="0 0 32 32">
+                                    <circle cx="16" cy="16" r="13" stroke="rgba(255,255,255,.08)" stroke-width="3"
+                                        fill="none" />
+                                    <circle cx="16" cy="16" r="13" stroke="#34d399" stroke-width="3" fill="none"
+                                        stroke-dasharray="81.68" stroke-dashoffset="24.5" stroke-linecap="round"
+                                        transform="rotate(-90 16 16)" />
+                                </svg>
+                                <div
+                                    style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#34d399">
+                                    70%</div>
+                            </div>
+                        </div>
+
+                        <!-- Satelita – pending -->
+                        <div class="map-row">
+                            <div class="map-icon satellite">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <rect x="5" y="3" width="14" height="10" rx="2" stroke="#fbbf24" stroke-width="1.8"
+                                        fill="none" />
+                                    <line x1="12" y1="13" x2="12" y2="17" stroke="#fbbf24" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                    <path d="M8 17 L16 17" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" />
+                                    <circle cx="12" cy="8" r="2" fill="rgba(251,191,36,0.4)" stroke="#fbbf24"
+                                        stroke-width="1.2" />
+                                    <line x1="3" y1="5" x2="5" y2="7" stroke="#fbbf24" stroke-width="1.3"
+                                        stroke-linecap="round" opacity="0.6" />
+                                    <line x1="21" y1="5" x2="19" y2="7" stroke="#fbbf24" stroke-width="1.3"
+                                        stroke-linecap="round" opacity="0.6" />
+                                </svg>
+                            </div>
+                            <div class="map-text">
+                                <div class="map-name">Zdjęcie Satelitarne HD</div>
+                                <div class="map-size">~112 MB · Geoportal · oczekuje</div>
+                            </div>
+                            <div class="dl-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="#34d399"
+                                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <polyline points="7,10 12,15 17,10" stroke="#34d399" stroke-width="2.2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <line x1="12" y1="15" x2="12" y2="3" stroke="#34d399" stroke-width="2.2"
+                                        stroke-linecap="round" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Storage note -->
+                <div class="storage-note">
+                    <div class="storage-icon">💡</div>
+                    <div class="storage-text">
+                        Mapy zostaną <strong>automatycznie usunięte</strong> po zakończeniu sesji. Zostanie tylko
+                        miniatura topograficzna jako pamiątka łowiska.
+                    </div>
+                </div>
+
+                <div style="height:70px"></div>
+            </div>
+
+            <!-- CTA: Jedź na łowisko! -->
+            <div class="cta-wrap">
+                <div class="cta-btn">
+                    <div class="cta-left">
+                        <div class="cta-car-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l4 4v8a2 2 0 0 1-2 2h-1" stroke="#fff"
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="7" cy="17" r="2" stroke="#fff" stroke-width="1.8" />
+                                <circle cx="17" cy="17" r="2" stroke="#fff" stroke-width="1.8" />
+                                <line x1="13" y1="17" x2="9" y2="17" stroke="#fff" stroke-width="1.8"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="cta-label">Jedź na Łowisko!</div>
+                            <div class="cta-sub">Topo pobrana · 2 z 3 map gotowych</div>
+                        </div>
+                    </div>
+                    <div class="cta-arrow">›</div>
+                </div>
+            </div>
+
+            <div class="nav-bar">
+                <div class="nav-pill"></div>
+            </div>
+        </div>
+        <p class="phone-meta">390×844 · Ekran 08 · Dzień Wyjazdu</p>
+    </div>
+    <script>
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 60;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+</body>
+
+</html>

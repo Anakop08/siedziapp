@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEDZI! – Schemat Przepływu Aplikacji</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-color: #f8fafc;
+            --header-color: #38bdf8;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            width: 95%;
+            max-width: 1200px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            color: var(--header-color);
+            margin-bottom: 40px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+
+        #diagram {
+            display: flex;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        #diagram svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        #error-box {
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid #f87171;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            display: none;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>SIEDZI! – Schemat Przepływu</h1>
+        <div id="diagram"></div>
+        <div id="error-box"></div>
+    </div>
+    <script>
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'dark',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+            themeVariables: {
+                primaryColor: '#1e40af',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#3b82f6',
+                lineColor: '#94a3b8',
+                secondaryColor: '#065f46',
+                tertiaryColor: '#5b21b6',
+                mainBkg: '#1e293b',
+                clusterBkg: 'rgba(255,255,255,0.05)',
+                clusterBorder: '#475569',
+                titleColor: '#38bdf8',
+                edgeLabelBackground: '#0f172a',
+                nodeTextColor: '#fff'
+            }
+        });
+
+        const diagramDefinition = `graph TD
+Start(Otwarcie aplikacji) --> Splash[Ekran powitalny]
+Splash --> Home[Dashboard Glowny]
+
+Home --> Nostalgia[Wspomnienia i Sukcesy]
+Home --> Planning[Zaplanuj Nowa Wyprawe]
+Home --> ActiveSession[Rozpocznij Sesje - nad woda]
+Home --> GalleryNav[Galeria Prywatna]
+Home --> SettingsNav[Ustawienia / Eksport]
+
+subgraph Motywacja
+    Nostalgia --> PastTrips[Historia Wypraw]
+    PastTrips --> PhotoGallery[Galeria Zdjec Ryb]
+    PastTrips --> WeatherHistory[Szczegoly Pogody - Archiwum]
+end
+
+subgraph Planowanie
+    Planning --> SelectDate[Wybierz Date i Urlop]
+    SelectDate --> SearchFishery[Wyszukaj Lowisko]
+    SearchFishery -->|Wybierz z listy| TripSummary[Podsumowanie Planu]
+    SearchFishery -->|Dodaj Nowe| NewFishery[Dodaj Nowe Lowisko]
+    NewFishery --> FisheryDetails[Wpisz Nazwe i Adres]
+    FisheryDetails --> AutoGPS[Automatyczna Lokalizacja GPS]
+    AutoGPS --> StationNote[Dodaj Notatke: Nr Stanowiska]
+    StationNote --> TripSummary
+    TripSummary --> DeepAnalysis[Strateg / Analityk Wyprawy]
+    DeepAnalysis --> AnalysisUI[Warunki: Pogoda / Cisnienie / Solunar]
+    DeepAnalysis --> HistoryComp[Historia: Zeszly rok / 5-lat Avg]
+    AnalysisUI --> Insights[Notatnik Strategii i Insightow]
+    HistoryComp --> Insights
+end
+
+Insights --> SaveTrip[Zatwierdz i Zapisz Wyprawe]
+
+subgraph DzienWyprawy[Dzien Wyprawy - Przed Wyjazdem]
+    SaveTrip --> RefreshData[Odswiez dane przed wyjazdem]
+    RefreshData --> CheckWeather[Sprawdz aktualna pogode]
+    RefreshData --> CheckSolunar[Sprawdz Solunar i gwiazdy]
+    RefreshData --> SyncBackup[Synchronizuj kopie zapasowa - Google Drive]
+    RefreshData --> DownloadMaps[Pobierz mapy offline]
+    DownloadMaps --> MapStd[Mapa standardowa]
+    DownloadMaps --> MapTopo[Mapa topograficzna]
+    DownloadMaps --> MapSat[Zdjecie satelitarne HD - Geoportal]
+    MapStd --> MapsReady[Mapy zapisane tymczasowo na telefonie]
+    MapTopo --> MapsReady
+    MapSat --> MapsReady
+end
+
+MapsReady --> GoFishing[Jedz na Lowisko!]
+GoFishing --> ActiveSession
+
+subgraph NadWoda[Nad Woda - Aktywna Sesja]
+    ActiveSession --> CheckIn[Melduj sie na stanowisku]
+    CheckIn --> SessionScreen[Ekran Sesji]
+    SessionScreen --> FisheryInfo[Opis lowiska - ryby i zakazy]
+    SessionScreen --> FisheryStats[Moje statystyki na tym lowisku]
+    SessionScreen --> FisheryTrips[Lista moich wyjazdow tu - historia]
+    FisheryInfo --> TackleForm[Formularz Zasadzki]
+    FisheryStats --> TackleForm
+    FisheryTrips --> TackleForm
+    TackleForm --> RodBait[Wedka / Przyneta / Zaneta]
+    TackleForm --> ReelLine[Kolowrotek / Zylka / Osprzet / Haczyki]
+    TackleForm --> Extras[Lodka zanetowa / Echosonda]
+    RodBait --> CastRod[Zarzuć wędkę]
+    ReelLine --> CastRod
+    Extras --> CastRod
+    CastRod --> Timeline[Osia Czasu Sesji - wpis z tagami zestawu]
+    Timeline --> Waiting[Aplikacja w kieszeni - czekasz na branie]
+    Waiting -->|Zmiana zestawu| ChangeSetup[Zmiana zestawu - edytujesz tylko co sie zmienilo]
+    ChangeSetup --> CastRod2[Zarzuc ponownie - nowy wpis na osi czasu]
+    CastRod2 --> Timeline
+    Waiting -->|Branie! Mam ryb e!| QuickPhoto[Szybkie zdjecie - 1 klik]
+    QuickPhoto -->|do 5 zdj ec| MorePhotos[Kolejne zdjecia do karty polowu]
+    QuickPhoto -->|6 zdjecie| PhotoLimit[Komunikat: max 5 zdj ec na karcie]
+    MorePhotos --> CatchCard[Karta Polowu - podglad zdj ec]
+    CatchCard --> CatchForm[Gatunek / Waga / Dlugosc]
+    CatchForm --> SaveCatch[Zapisz polow]
+    SaveCatch --> AutoMeta[Auto: GPS + Godzina + Pogoda + Solunar]
+    AutoMeta --> CatchOnTimeline[Karta na osi czasu - tagi pogody + miniaturka ryby]
+    CatchOnTimeline --> Timeline
+    Timeline -->|Koniec dnia| EndSession{Zakonczyc sesje?}
+end
+
+subgraph ZakonczenieSeji[Koniec Sesji]
+    EndSession -->|Tak| SessionCard[Karta Sesji - auto-obliczenia]
+    SessionCard --> SessionStats[Ikony ryb + ilosc + waga + czas trwania]
+    SessionCard --> ThemeSwitch[Przelacz motyw: jasny / ciemny / kolorowy]
+    ThemeSwitch --> HomeReturn[Ekran Glowny - widoczna karta ostatniej sesji]
+    HomeReturn --> History[Historia Wyjazdow]
+    History --> SessionDetail[Szczegoly Sesji - zdjecia + szczegoly + sprzet]
+end
+
+HomeReturn --> CleanupMaps[Usun tymczasowe mapy - zostaje miniatura topo]
+CleanupMaps --> SyncFinal[Synchronizuj backup - Google Drive]
+
+subgraph HistoriaScreen[Historia Wyjazdow]
+    History --> HistoryList[Lista sesji]
+    HistoryList --> HistorySearch[Filtruj: data / lowisko / gatunek ryby]
+    HistorySearch --> SessionDetail
+end
+
+subgraph GaleriaScreen[Galeria Prywatna]
+    GalleryNav --> GalleryGrid[Grupy po 5 zdj ec - pierwsze na froncie]
+    GalleryGrid --> PhotoCarousel[Karuzela zdj ec polowu]
+    PhotoCarousel --> ReorderPhoto[Zmien kolejnosc / ustaw zdjecie glowne]
+    PhotoCarousel --> EditPhoto[Edytuj: przytnij / usun]
+    PhotoCarousel --> SharePhoto[Udostepnij do innej aplikacji]
+    SharePhoto --> AutoTag[Auto-opis: waga + wymiary + lowisko]
+    AutoTag -->|Wlacz / Wylacz| ShareFinal[Wyslij - Instagram / Facebook / Chat]
+end
+
+subgraph UstawieniaScreen[Ustawienia]
+    SettingsNav --> ExportData[Eksportuj dane na Google Drive]
+    ExportData --> BackupFull[Kopia zapasowa: dane + zdjecia]
+    SettingsNav --> DictManager[Slowniki Sprzetu i Przynety]
+end
+
+subgraph SlownikiScreen[Zarządzanie Slownikami]
+    DictManager --> DictRods[Slownik: Wedki i Zestawy]
+    DictManager --> DictBaits[Slownik: Przynety i Zanety]
+    DictManager --> DictHooks[Slownik: Haczyki i Osprzet]
+    DictManager --> FisheryManager[Lista Lowisk]
+    FisheryManager --> AddNewFisheryExt[Dodaj Nowe Lowisko]
+    AddNewFisheryExt --> FisheryName[Nazwa i Adres]
+    FisheryName --> MapPicker[Kliknij na mapie - pobierz GPS]
+    MapPicker --> MapFullscreen[Mapa pelnoekranowa - wybierz miejsce]
+    MapFullscreen --> SaveTopoClip[Zapisz wycinek mapy topograficznej]
+    SaveTopoClip --> FisheryReady[Lowisko dostepne w planowaniu wyjazdow]
+end
+
+classDef main fill:#1e40af,stroke:#3b82f6,stroke-width:2px,color:#fff
+classDef memory fill:#5b21b6,stroke:#8b5cf6,stroke-width:1px,color:#fff
+classDef planning fill:#065f46,stroke:#10b981,stroke-width:1px,color:#fff
+classDef departure fill:#92400e,stroke:#f59e0b,stroke-width:1px,color:#fff
+classDef session fill:#0e7490,stroke:#22d3ee,stroke-width:1px,color:#fff
+classDef gallery fill:#7c3aed,stroke:#a78bfa,stroke-width:1px,color:#fff
+classDef settings fill:#374151,stroke:#9ca3af,stroke-width:1px,color:#fff
+classDef banner fill:#0e7490,stroke:#22d3ee,stroke-width:2px,stroke-dasharray:5 3,color:#fff
+
+subgraph BannerMechanism["Active Session Banner - cross-screen"]
+    Banner["Sesja aktywna - widoczny na wszystkich ekranach poza sesja"]
+    Banner -->|"1 tap"| Timeline
+end
+
+Banner -.->|sesja aktywna| Home
+Banner -.->|sesja aktywna| GalleryNav
+Banner -.->|sesja aktywna| Nostalgia
+Banner -.->|sesja aktywna| SettingsNav
+
+class Home main
+class Nostalgia,PastTrips,PhotoGallery,WeatherHistory memory
+class Planning,SelectDate,SearchFishery,NewFishery,FisheryDetails,TripSummary,DeepAnalysis,AnalysisUI,HistoryComp,Insights,AutoGPS,StationNote planning
+class RefreshData,CheckWeather,CheckSolunar,SyncBackup,DownloadMaps,MapStd,MapTopo,MapSat,MapsReady,GoFishing departure
+class CheckIn,SessionScreen,FisheryInfo,FisheryStats,FisheryTrips,TackleForm,RodBait,ReelLine,Extras,CastRod,Timeline,Waiting,ChangeSetup,CastRod2,QuickPhoto,MorePhotos,PhotoLimit,CatchCard,CatchForm,SaveCatch,AutoMeta,CatchOnTimeline,EndSession session
+class SessionCard,SessionStats,ThemeSwitch,HomeReturn,History,SessionDetail,CleanupMaps,SyncFinal,HistoryList,HistorySearch memory
+class GalleryNav,GalleryGrid,PhotoCarousel,ReorderPhoto,EditPhoto,SharePhoto,AutoTag,ShareFinal gallery
+class SettingsNav,ExportData,BackupFull,DictManager,DictRods,DictBaits,DictHooks,FisheryManager,AddNewFisheryExt,FisheryName,MapPicker,MapFullscreen,SaveTopoClip,FisheryReady settings
+class Banner banner`;
+
+
+        async function render() {
+            try {
+                const { svg } = await mermaid.render('flowchart-svg', diagramDefinition);
+                document.getElementById('diagram').innerHTML = svg;
+            } catch (e) {
+                const errorBox = document.getElementById('error-box');
+                errorBox.style.display = 'block';
+                errorBox.textContent = 'Mermaid Error:\n' + (e.message || JSON.stringify(e));
+                console.error('Mermaid render error:', e);
+            }
+        }
+
+        render();
+    </script>
+</body>
+
+</html>

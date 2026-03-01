@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 05 Planowanie: Wyszukaj Łowisko</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            background: #060f0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #080f0a;
+            border-radius: 52px;
+            box-shadow:
+                0 0 0 2px #2a2e2a,
+                0 0 0 5px #1a1e1a,
+                0 30px 80px rgba(0, 0, 0, 0.85),
+                inset 0 0 0 1px #2e3530;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 140px;
+            width: 3px;
+            height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px;
+            top: 120px;
+            width: 3px;
+            height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .status-bar .time {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .status-icons svg {
+            fill: #e0e0e0;
+        }
+
+        /* Screen body */
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            padding: 6px 8px 8px 4px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #080f0a;
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+        }
+
+        .top-bar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .top-bar-title span {
+            color: #34d399;
+        }
+
+        /* Step indicator */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 20px 14px;
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .step-dot.active {
+            background: #34d399;
+            box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+        }
+
+        .step-dot.done {
+            background: rgba(52, 211, 153, 0.4);
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 1px;
+        }
+
+        .step-line.done {
+            background: rgba(52, 211, 153, 0.3);
+        }
+
+        .step-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .step-label.done {
+            color: rgba(52, 211, 153, 0.6);
+        }
+
+        .step-label.active {
+            color: #34d399;
+            font-weight: 500;
+        }
+
+        /* Selected date banner */
+        .date-banner {
+            margin: 0 16px 14px;
+            background: rgba(52, 211, 153, 0.07);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            border-radius: 14px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-banner-icon {
+            font-size: 18px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .date-banner-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .date-banner-text strong {
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        .date-banner-change {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        /* Search bar */
+        .search-wrap {
+            padding: 0 16px 14px;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid rgba(52, 211, 153, 0.35);
+            border-radius: 16px;
+            padding: 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 48px;
+        }
+
+        .search-icon-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .search-icon-svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+        }
+
+        .search-input {
+            flex: 1;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            background: none;
+            border: none;
+            outline: none;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .search-cursor {
+            width: 2px;
+            height: 16px;
+            background: #34d399;
+            animation: blink 1s step-end infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .search-clear {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Filter chips */
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .filter-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.55);
+            white-space: nowrap;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .filter-chip.active {
+            background: rgba(52, 211, 153, 0.15);
+            border-color: rgba(52, 211, 153, 0.4);
+            color: #34d399;
+        }
+
+        .filter-chip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Section label */
+        .section-title {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 0 20px 10px;
+        }
+
+        /* Fishery list */
+        .fishery-list {
+            padding: 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .fishery-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 14px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .fishery-card:active {
+            background: rgba(52, 211, 153, 0.07);
+        }
+
+        .fishery-card.selected {
+            background: rgba(52, 211, 153, 0.09);
+            border-color: rgba(52, 211, 153, 0.45);
+        }
+
+        /* Map thumbnail */
+        .fish-thumb {
+            width: 58px;
+            height: 58px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .fish-thumb svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .fish-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .fish-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fish-loc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .fish-tags {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .fish-tag {
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.07);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .fish-tag.green {
+            background: rgba(52, 211, 153, 0.12);
+            color: rgba(52, 211, 153, 0.8);
+        }
+
+        .fish-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .fish-stars {
+            font-size: 11px;
+            color: #fbbf24;
+            letter-spacing: -1px;
+        }
+
+        .fish-dist {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .fish-last {
+            font-size: 10px;
+            color: rgba(52, 211, 153, 0.6);
+            font-weight: 500;
+        }
+
+        /* Selected indicator */
+        .fish-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #059669;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fish-check svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        /* Add new fishery tile */
+        .add-fishery-tile {
+            margin: 10px 16px 0;
+            border: 1.5px dashed rgba(52, 211, 153, 0.25);
+            border-radius: 18px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .add-fishery-tile:active {
+            background: rgba(52, 211, 153, 0.05);
+        }
+
+        .add-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            background: rgba(52, 211, 153, 0.1);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 22px;
+            color: #34d399;
+        }
+
+        .add-text {
+            flex: 1;
+        }
+
+        .add-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .add-sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 2px;
+        }
+
+        /* Sticky CTA */
+        .cta-wrap {
+            padding: 12px 16px 6px;
+            background: linear-gradient(to bottom, transparent, rgba(8, 15, 10, 0.95) 40%);
+        }
+
+        .cta-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #059669, #047857);
+            border-radius: 16px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.35);
+            transition: transform 0.15s;
+        }
+
+        .cta-btn:active {
+            transform: scale(0.98);
+        }
+
+        .cta-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cta-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cta-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .cta-sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.65);
+            margin-top: 1px;
+        }
+
+        .cta-arrow {
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Nav bar */
+        .nav-bar {
+            height: 34px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-pill {
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.27);
+            border-radius: 2px;
+        }
+
+        .phone-meta {
+            color: #444;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <p class="screen-label">SIEDZI! · Ekran 05 / 26 · Planowanie: Wyszukaj Łowisko</p>
+
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+
+            <div class="dynamic-island"></div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span class="time">08:15</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <rect x="0" y="8" width="3" height="4" rx="0.5" />
+                        <rect x="4" y="5" width="3" height="7" rx="0.5" />
+                        <rect x="8" y="2" width="3" height="10" rx="0.5" />
+                        <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35" />
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z" />
+                        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                            stroke-linecap="round" />
+                        <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none"
+                            stroke-linecap="round" />
+                    </svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12">
+                        <rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2"
+                            fill="none" />
+                        <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6" />
+                        <rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Screen body -->
+            <div class="screen-body">
+
+                <!-- Top Bar -->
+                <div class="top-bar">
+                    <div class="back-btn">
+                        <span class="material-icons-outlined"
+                            style="font-size:22px;color:rgba(255,255,255,0.6)">arrow_back</span>
+                    </div>
+                    <div class="top-bar-title">Zaplanuj <span>Wyprawę</span></div>
+                </div>
+
+                <!-- Step indicator: Krok 2/3 -->
+                <div class="step-indicator">
+                    <div class="step-dot done"></div>
+                    <div class="step-label done">Termin</div>
+                    <div class="step-line done"></div>
+                    <div class="step-dot active"></div>
+                    <div class="step-label active">Łowisko</div>
+                    <div class="step-line"></div>
+                    <div class="step-dot"></div>
+                    <div class="step-label">Analiza</div>
+                </div>
+
+                <!-- Selected date summary -->
+                <div class="date-banner">
+                    <div class="date-banner-icon">📅</div>
+                    <div class="date-banner-text"><strong>20–23 marca 2026</strong> · 4 dni</div>
+                    <div class="date-banner-change">Zmień</div>
+                </div>
+
+                <!-- Search bar (active) -->
+                <div class="search-wrap">
+                    <div class="search-bar">
+                        <div class="search-icon-wrap">
+                            <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none">
+                                <circle cx="11" cy="11" r="7" stroke="#34d399" stroke-width="2" />
+                                <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="#34d399" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="search-input">
+                            Jezioro Białe<span class="search-cursor"></span>
+                        </div>
+                        <div class="search-clear">✕</div>
+                    </div>
+                </div>
+
+                <!-- Filter chips -->
+                <div class="filter-row">
+                    <div class="filter-chip active">
+                        <div class="filter-chip-dot"></div>Ulubione
+                    </div>
+                    <div class="filter-chip">Ostatnio Odwiedzone</div>
+                    <div class="filter-chip">Karpie</div>
+                    <div class="filter-chip">Rzeki</div>
+                    <div class="filter-chip">Jeziora</div>
+                    <div class="filter-chip">Stawy</div>
+                </div>
+
+                <!-- Results -->
+                <div class="section-title">Twoje Łowiska (12)</div>
+                <div class="fishery-list">
+
+                    <!-- SELECTED card -->
+                    <div class="fishery-card selected">
+                        <!-- Map thumbnail – topo-style inline SVG -->
+                        <div class="fish-thumb">
+                            <svg viewBox="0 0 58 58" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="58" height="58" fill="#0d2010" />
+                                <!-- Contour lines -->
+                                <ellipse cx="29" cy="29" rx="24" ry="18" fill="none" stroke="#1a3a1f"
+                                    stroke-width="1.2" />
+                                <ellipse cx="29" cy="29" rx="18" ry="13" fill="none" stroke="#1d4023"
+                                    stroke-width="1" />
+                                <ellipse cx="29" cy="29" rx="12" ry="8" fill="none" stroke="#1f4825"
+                                    stroke-width="0.8" />
+                                <!-- Water body -->
+                                <ellipse cx="29" cy="32" rx="11" ry="7" fill="#0e4a6e" opacity="0.8" />
+                                <ellipse cx="29" cy="32" rx="9" ry="5.5" fill="#0d5c87" opacity="0.7" />
+                                <!-- Shore highlight -->
+                                <ellipse cx="27" cy="30" rx="4" ry="2.5" fill="none" stroke="rgba(34,211,238,0.3)"
+                                    stroke-width="0.8" />
+                                <!-- Dot marker -->
+                                <circle cx="24" cy="27" r="2.5" fill="#34d399" />
+                                <circle cx="24" cy="27" r="1.2" fill="#fff" />
+                            </svg>
+                        </div>
+                        <div class="fish-info">
+                            <div class="fish-name">Jezioro Białe</div>
+                            <div class="fish-loc">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z"
+                                        fill="rgba(255,255,255,0.35)" />
+                                </svg>
+                                Mazury, pow. giżycki
+                            </div>
+                            <div class="fish-tags">
+                                <span class="fish-tag green">⭐ Ulubione</span>
+                                <span class="fish-tag">Karp</span>
+                                <span class="fish-tag">Lin</span>
+                                <span class="fish-tag">Sandacz</span>
+                            </div>
+                        </div>
+                        <div class="fish-meta">
+                            <div class="fish-stars">★★★★★</div>
+                            <div class="fish-dist">42 km</div>
+                            <div class="fish-last">7 dni temu</div>
+                        </div>
+                        <div class="fish-check">
+                            <svg viewBox="0 0 13 10" fill="none">
+                                <path d="M1 5l4 4L12 1" stroke="#fff" stroke-width="2.2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Normal card 2 -->
+                    <div class="fishery-card">
+                        <div class="fish-thumb">
+                            <svg viewBox="0 0 58 58" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="58" height="58" fill="#141a0e" />
+                                <path d="M5 35 Q15 20 29 28 Q43 36 53 22" fill="none" stroke="#1f3a15"
+                                    stroke-width="8" />
+                                <path d="M5 35 Q15 20 29 28 Q43 36 53 22" fill="none" stroke="#0d4a6e"
+                                    stroke-width="4" />
+                                <path d="M5 35 Q15 20 29 28 Q43 36 53 22" fill="none" stroke="#0d5c87"
+                                    stroke-width="2" />
+                                <circle cx="32" cy="24" r="2.5" fill="#fbbf24" />
+                                <circle cx="32" cy="24" r="1.2" fill="#fff" />
+                            </svg>
+                        </div>
+                        <div class="fish-info">
+                            <div class="fish-name">Rzeka Drwęca</div>
+                            <div class="fish-loc">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z"
+                                        fill="rgba(255,255,255,0.35)" />
+                                </svg>
+                                warmińsko-mazurskie
+                            </div>
+                            <div class="fish-tags">
+                                <span class="fish-tag">Troć</span>
+                                <span class="fish-tag">Szczupak</span>
+                            </div>
+                        </div>
+                        <div class="fish-meta">
+                            <div class="fish-stars">★★★★☆</div>
+                            <div class="fish-dist">88 km</div>
+                            <div class="fish-last">3 tyg. temu</div>
+                        </div>
+                    </div>
+
+                    <!-- Normal card 3 -->
+                    <div class="fishery-card">
+                        <div class="fish-thumb">
+                            <svg viewBox="0 0 58 58" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="58" height="58" fill="#0d1a12" />
+                                <ellipse cx="29" cy="30" rx="20" ry="15" fill="none" stroke="#1a3520"
+                                    stroke-width="1.5" />
+                                <ellipse cx="29" cy="30" rx="14" ry="10" fill="none" stroke="#1e3d24"
+                                    stroke-width="1" />
+                                <ellipse cx="29" cy="30" rx="13" ry="9" fill="#0d4060" opacity="0.7" />
+                                <ellipse cx="29" cy="30" rx="11" ry="7.5" fill="#0a4f78" opacity="0.7" />
+                                <circle cx="20" cy="22" r="2.5" fill="#a78bfa" />
+                                <circle cx="20" cy="22" r="1.2" fill="#fff" />
+                            </svg>
+                        </div>
+                        <div class="fish-info">
+                            <div class="fish-name">Jezioro Czarne</div>
+                            <div class="fish-loc">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z"
+                                        fill="rgba(255,255,255,0.35)" />
+                                </svg>
+                                pow. szczycieński
+                            </div>
+                            <div class="fish-tags">
+                                <span class="fish-tag">Karp</span>
+                                <span class="fish-tag">Karaś</span>
+                            </div>
+                        </div>
+                        <div class="fish-meta">
+                            <div class="fish-stars">★★★☆☆</div>
+                            <div class="fish-dist">115 km</div>
+                            <div class="fish-last">2 mies. temu</div>
+                        </div>
+                    </div>
+
+                </div><!-- /.fishery-list -->
+
+                <!-- Add new fishery -->
+                <div class="add-fishery-tile">
+                    <div class="add-icon">＋</div>
+                    <div class="add-text">
+                        <div class="add-title">Dodaj Nowe Łowisko</div>
+                        <div class="add-sub">Nazwa, lokalizacja GPS, notatki</div>
+                    </div>
+                    <span class="material-icons-outlined"
+                        style="font-size:18px;color:rgba(52,211,153,0.5)">chevron_right</span>
+                </div>
+
+                <div style="height: 80px;"></div>
+
+            </div><!-- /.screen-body -->
+
+            <!-- Sticky CTA at bottom -->
+            <div class="cta-wrap">
+                <div class="cta-btn">
+                    <div class="cta-left">
+                        <div class="cta-icon-box">
+                            <!-- inline SVG analytics icon -->
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <rect x="3" y="3" width="18" height="18" rx="3" stroke="rgba(255,255,255,0.8)"
+                                    stroke-width="1.8" fill="none" />
+                                <line x1="8" y1="16" x2="8" y2="12" stroke="rgba(255,255,255,0.8)" stroke-width="1.8"
+                                    stroke-linecap="round" />
+                                <line x1="12" y1="16" x2="12" y2="8" stroke="rgba(255,255,255,0.8)" stroke-width="1.8"
+                                    stroke-linecap="round" />
+                                <line x1="16" y1="16" x2="16" y2="10" stroke="rgba(255,255,255,0.8)" stroke-width="1.8"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="cta-label">Analizuj Wyprawę</div>
+                            <div class="cta-sub">Krok 3 z 3 – warunki i strategia</div>
+                        </div>
+                    </div>
+                    <div class="cta-arrow">›</div>
+                </div>
+            </div>
+
+            <!-- Nav bar -->
+            <div class="nav-bar">
+                <div class="nav-pill"></div>
+            </div>
+
+        </div><!-- /.phone -->
+        <p class="phone-meta">390 × 844 · Android · MD3 Dark · Planowanie – Łowisko</p>
+    </div>
+
+    <script>
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 60;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+
+</body>
+
+</html>

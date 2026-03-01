@@ -1,0 +1,23 @@
+# Task Boundary – Śledzik brań
+
+## Zakres projektu
+
+- Aplikacja mobilna Android (Kotlin, Jetpack Compose)
+- Dziennik wędkarski z modułem analitycznym
+- MVP skierowane do karpiarzy
+- Offline-first, Privacy-first, MD3/MD4
+
+## Granice (nie wychodzić poza)
+
+- **Platforma:** Tylko Android. Brak iOS/Web w tym projekcie.
+- **Źródła danych:** Open-Meteo, GUGiK, lokalne pliki (CSV/XLSX, HTML). Brak własnego backendu.
+- **Backup:** Google Drive (User-owned). Brak dedykowanego clouda.
+- **Ikony pogody:** Wyłącznie `weather-icons.js` / custom inline SVG. Brak emoji do pogody.
+- **Ikony nawigacyjne:** Material Icons Outlined. Brak emoji w kafelkach/kartach.
+
+## Zasady implementacji
+
+1. Każda faza kończy się checkpointem zdefiniowanym w `implementation_plan.md`.
+2. Przed rozpoczęciem nowej fazy: weryfikacja schematu Room, migracje.
+3. UI: zgodność z `design-system.md`, prototypy HTML jako referencja.
+4. Brak zbędnych interakcji – agent działa autonomicznie do końca fazy.

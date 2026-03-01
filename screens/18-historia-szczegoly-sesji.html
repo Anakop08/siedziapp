@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 18 Historia: Szczegóły Sesji</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <script src="weather-icons.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { overflow: hidden; height: 100%; }
+
+        body {
+            background: #060610;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+
+        /* Phone frame */
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #08080e;
+            border-radius: 52px;
+            box-shadow: 0 0 0 2px #2a2a2e, 0 0 0 5px #1a1a1e,
+                0 30px 80px rgba(0,0,0,.85), inset 0 0 0 1px #2a2535;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px; top: 140px;
+            width: 3px; height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px; top: 120px;
+            width: 3px; height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px; left: 50%;
+            transform: translateX(-50%);
+            width: 120px; height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        /* Status bar */
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
+            background: #08080e;
+        }
+
+        .status-bar .time { font-size: 14px; font-weight: 600; color: #e0e0e0; }
+        .status-icons { display: flex; gap: 6px; align-items: center; }
+        .status-icons svg { fill: #e0e0e0; }
+
+        /* Top bar (fixed) */
+        .top-bar {
+            padding: 10px 16px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #08080e;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .back-btn svg { stroke: rgba(255,255,255,.6); }
+
+        .top-title { flex: 1; font-size: 18px; font-weight: 600; color: #fff; }
+        .top-title span { color: #a78bfa; }
+
+        .share-btn {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(139,92,246,.1);
+            border: 1px solid rgba(139,92,246,.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .share-btn .material-icons-outlined {
+            font-size: 20px; width: 20px; height: 20px; line-height: 20px;
+            color: #a78bfa;
+        }
+
+        /* Scrollable body */
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+        }
+
+        .screen-body::-webkit-scrollbar { display: none; }
+
+        /* ---- Session hero card ---- */
+        .session-hero {
+            margin: 14px 16px 0;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(91,33,182,.2), rgba(124,58,237,.08));
+            border: 1px solid rgba(139,92,246,.3);
+            border-radius: 20px;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 4px;
+        }
+
+        .hero-location {
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .hero-weather {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hero-weather-temp {
+            font-size: 12px;
+            color: rgba(255,255,255,.65);
+        }
+
+        .hero-date {
+            font-size: 11px;
+            color: rgba(255,255,255,.55);
+            margin-bottom: 14px;
+        }
+
+        .hero-time-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .hero-time {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .hero-time-sep {
+            font-size: 16px;
+            color: rgba(255,255,255,.3);
+        }
+
+        .hero-dur-pill {
+            background: rgba(139,92,246,.15);
+            border: 1px solid rgba(139,92,246,.3);
+            border-radius: 14px;
+            padding: 4px 11px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #c4b5fd;
+        }
+
+        .hero-stats-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .hero-stat {
+            flex: 1;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 12px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .hero-stat-val {
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .hero-stat-val.amber { color: #fbbf24; }
+
+        .hero-stat-lbl {
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.45);
+            margin-top: 2px;
+        }
+
+        .hero-fish-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .hero-fish-chip {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: rgba(251,191,36,.08);
+            border: 1px solid rgba(251,191,36,.22);
+            color: rgba(255,255,255,.75);
+        }
+
+        /* ---- Section label ---- */
+        .sect-label {
+            padding: 0 16px;
+            margin: 16px 0 9px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.55);
+        }
+
+        /* ---- Photo strip ---- */
+        .photo-strip {
+            padding: 0 16px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .photo-strip::-webkit-scrollbar { display: none; }
+
+        .photo-thumb {
+            width: 90px;
+            height: 90px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(251,191,36,.12), rgba(120,60,10,.2));
+            border: 1px solid rgba(251,191,36,.22);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .photo-thumb::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 25% 75%, rgba(14,116,144,.18) 0%, transparent 65%);
+        }
+
+        .photo-thumb svg { position: relative; }
+        .photo-thumb-label {
+            font-size: 9px;
+            color: rgba(255,255,255,.6);
+            position: relative;
+        }
+
+        .photo-thumb-fish {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255,255,255,.8);
+            position: relative;
+        }
+
+        /* ---- Timeline ---- */
+        .timeline {
+            padding: 0 16px;
+        }
+
+        .tl-entry {
+            display: flex;
+            gap: 0;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        /* vertical line */
+        .tl-entry::before {
+            content: '';
+            position: absolute;
+            left: 14px; top: 22px;
+            width: 1px;
+            bottom: 0;
+            background: rgba(255,255,255,.07);
+        }
+
+        .tl-entry:last-child::before { display: none; }
+
+        .tl-dot-col {
+            width: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 8px;
+            flex-shrink: 0;
+        }
+
+        .tl-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: rgba(34,211,238,.4);
+            border: 2px solid #22d3ee;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .tl-dot.amber {
+            background: rgba(251,191,36,.5);
+            border-color: #fbbf24;
+        }
+
+        .tl-dot.purple {
+            background: rgba(139,92,246,.4);
+            border-color: #8b5cf6;
+        }
+
+        .tl-dot.grey {
+            background: rgba(255,255,255,.15);
+            border-color: rgba(255,255,255,.3);
+        }
+
+        .tl-content { flex: 1; padding-left: 10px; }
+
+        /* Cast entry */
+        .cast-entry {
+            padding: 9px 12px;
+            background: rgba(255,255,255,.02);
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 12px;
+        }
+
+        .entry-time {
+            font-size: 10px;
+            color: rgba(255,255,255,.45);
+            margin-bottom: 3px;
+        }
+
+        .entry-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,.85);
+            margin-bottom: 6px;
+        }
+
+        .entry-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .entry-tag {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: rgba(34,211,238,.07);
+            border: 1px solid rgba(34,211,238,.15);
+            color: rgba(255,255,255,.7);
+        }
+
+        .entry-tag.purple {
+            background: rgba(139,92,246,.08);
+            border-color: rgba(139,92,246,.2);
+        }
+
+        .entry-tag.change {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(251,191,36,.06);
+            border-color: rgba(251,191,36,.15);
+        }
+
+        .tag-old { color: rgba(255,255,255,.4); text-decoration: line-through; }
+        .tag-arrow { color: rgba(255,255,255,.3); }
+        .tag-new { color: rgba(255,255,255,.8); }
+
+        /* Catch entry (expanded) */
+        .catch-entry {
+            padding: 11px 12px;
+            background: rgba(251,191,36,.05);
+            border: 1px solid rgba(251,191,36,.18);
+            border-radius: 14px;
+        }
+
+        .catch-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 9px;
+        }
+
+        .catch-fish-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: rgba(251,191,36,.12);
+            border: 1px solid rgba(251,191,36,.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .catch-fish-info { flex: 1; }
+
+        .catch-fish-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255,255,255,.95);
+        }
+
+        .catch-fish-stats {
+            font-size: 11px;
+            color: rgba(255,255,255,.6);
+            margin-top: 1px;
+        }
+
+        .catch-fish-nickname {
+            font-size: 10px;
+            font-style: italic;
+            color: #fbbf24;
+            margin-top: 1px;
+        }
+
+        .catch-weight-big {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fbbf24;
+            flex-shrink: 0;
+        }
+
+        .catch-weight-unit {
+            font-size: 11px;
+            font-weight: 400;
+            color: rgba(255,255,255,.5);
+        }
+
+        /* Catch detail row: photo + tackle + weather */
+        .catch-detail-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .catch-photo {
+            width: 68px; height: 68px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(251,191,36,.1), rgba(80,40,5,.2));
+            border: 1px solid rgba(251,191,36,.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .catch-photo::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 70%, rgba(14,116,144,.15) 0%, transparent 60%);
+        }
+
+        .catch-photo svg { position: relative; }
+
+        .catch-meta {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 5px;
+        }
+
+        .catch-tackle-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .catch-tackle-chip {
+            font-size: 9px;
+            font-weight: 500;
+            padding: 2px 7px;
+            border-radius: 7px;
+            background: rgba(34,211,238,.07);
+            border: 1px solid rgba(34,211,238,.14);
+            color: rgba(255,255,255,.7);
+        }
+
+        .catch-conditions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .cond-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            color: rgba(255,255,255,.6);
+        }
+
+        .cond-icon {
+            width: 14px; height: 14px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cond-icon .material-icons-outlined {
+            font-size: 13px; width: 13px; height: 13px; line-height: 13px;
+            color: rgba(255,255,255,.45);
+        }
+
+        .cond-solunar {
+            font-size: 10px;
+            padding: 1px 7px;
+            border-radius: 6px;
+            background: rgba(139,92,246,.1);
+            border: 1px solid rgba(139,92,246,.2);
+            color: #c4b5fd;
+            font-weight: 500;
+        }
+
+        /* End entry */
+        .end-entry {
+            padding: 8px 12px;
+            background: rgba(52,211,153,.04);
+            border: 1px solid rgba(52,211,153,.12);
+            border-radius: 12px;
+            font-size: 12px;
+            color: rgba(255,255,255,.65);
+        }
+
+        /* ---- Weather summary ---- */
+        .weather-summary {
+            margin: 0 16px;
+            padding: 14px;
+            background: rgba(255,255,255,.02);
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 14px;
+        }
+
+        .weather-top-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .weather-main-icon { flex-shrink: 0; }
+
+        .weather-main-info { flex: 1; }
+
+        .weather-desc {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,.9);
+        }
+
+        .weather-temp-range {
+            font-size: 11px;
+            color: rgba(255,255,255,.55);
+            margin-top: 2px;
+        }
+
+        .weather-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .weather-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .wsi-icon {
+            width: 20px; height: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .wsi-icon .material-icons-outlined {
+            font-size: 16px; width: 16px; height: 16px; line-height: 16px;
+            color: rgba(139,92,246,.8);
+        }
+
+        .wsi-text { font-size: 11px; color: rgba(255,255,255,.65); }
+        .wsi-val { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.85); }
+
+        /* Solunar strip */
+        .solunar-strip {
+            margin: 8px 0 0;
+            padding: 10px 12px;
+            background: rgba(139,92,246,.07);
+            border: 1px solid rgba(139,92,246,.18);
+            border-radius: 10px;
+        }
+
+        .solunar-label {
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: rgba(139,92,246,.8);
+            margin-bottom: 7px;
+        }
+
+        .solunar-rows { display: flex; flex-direction: column; gap: 4px; }
+
+        .sol-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sol-badge {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+            min-width: 44px;
+            text-align: center;
+        }
+
+        .sol-badge.major {
+            background: rgba(139,92,246,.2);
+            border: 1px solid rgba(139,92,246,.35);
+            color: #c4b5fd;
+        }
+
+        .sol-badge.minor {
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.12);
+            color: rgba(255,255,255,.6);
+        }
+
+        .sol-time { font-size: 11px; color: rgba(255,255,255,.7); }
+        .sol-comment { font-size: 10px; color: rgba(255,255,255,.45); font-style: italic; }
+
+        .scroll-bottom-pad { height: 12px; }
+
+        /* Active Session Banner */
+        .session-banner {
+            margin: 0 16px 6px;
+            padding: 9px 14px;
+            background: rgba(14,116,144,.18);
+            border: 1px solid rgba(34,211,238,.25);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .banner-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #22d3ee;
+            box-shadow: 0 0 8px rgba(34,211,238,.6);
+            flex-shrink: 0;
+        }
+        .banner-text {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255,255,255,.8);
+        }
+        .banner-text strong { color: #22d3ee; }
+        .banner-arrow .material-icons-outlined {
+            font-size: 16px; color: rgba(34,211,238,.6);
+        }
+
+        /* Nav bar */
+        .nav-bar {
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-pill {
+            width: 100px; height: 4px;
+            background: rgba(255,255,255,.27);
+            border-radius: 2px;
+        }
+
+        .phone-meta {
+            color: #444;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <p class="screen-label">SIEDZI! · Ekran 18 / 26 · Historia: Szczegóły Sesji</p>
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+            <div class="dynamic-island"></div>
+
+            <!-- Status bar -->
+            <div class="status-bar">
+                <span class="time">18:30</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <rect x="0" y="8" width="3" height="4" rx="0.5"/>
+                        <rect x="4" y="5" width="3" height="7" rx="0.5"/>
+                        <rect x="8" y="2" width="3" height="10" rx="0.5"/>
+                        <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35"/>
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z"/>
+                        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                        <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                    </svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12">
+                        <rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2" fill="none"/>
+                        <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6"/>
+                        <rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Top bar (fixed) -->
+            <div class="top-bar">
+                <div class="back-btn">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 12H5m0 0 7-7m-7 7 7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="top-title">Szczegóły <span>Sesji</span></div>
+                <div class="share-btn">
+                    <span class="material-icons-outlined">share</span>
+                </div>
+            </div>
+
+            <!-- Scrollable body -->
+            <div class="screen-body">
+
+                <!-- Hero card -->
+                <div class="session-hero">
+                    <div class="hero-top">
+                        <div class="hero-location">Jezioro Mielnickie</div>
+                        <div class="hero-weather">
+                            <div data-weather-icon="clear-day" data-size="22"></div>
+                            <span class="hero-weather-temp">21°C</span>
+                        </div>
+                    </div>
+                    <div class="hero-date">Sobota, 21 lutego 2026</div>
+                    <div class="hero-time-row">
+                        <span class="hero-time">06:15</span>
+                        <span class="hero-time-sep">→</span>
+                        <span class="hero-time">14:32</span>
+                        <span class="hero-dur-pill">8 godz. 17 min</span>
+                    </div>
+                    <div class="hero-stats-row">
+                        <div class="hero-stat">
+                            <div class="hero-stat-val">4</div>
+                            <div class="hero-stat-lbl">Rzutów</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-val">4</div>
+                            <div class="hero-stat-lbl">Połowów</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-val amber">8,5 kg</div>
+                            <div class="hero-stat-lbl">Łączna waga</div>
+                        </div>
+                    </div>
+                    <div class="hero-fish-row">
+                        <span class="hero-fish-chip">Karp ×2</span>
+                        <span class="hero-fish-chip">Leszcz ×1</span>
+                        <span class="hero-fish-chip">Karaś ×1</span>
+                    </div>
+                </div>
+
+                <!-- Zdjęcia -->
+                <div class="sect-label">Zdjęcia</div>
+                <div class="photo-strip">
+                    <div class="photo-thumb">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                                stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="13" r="4" stroke="#fbbf24" stroke-width="1.8"/>
+                        </svg>
+                        <span class="photo-thumb-fish">Karp</span>
+                        <span class="photo-thumb-label">09:48</span>
+                    </div>
+                    <div class="photo-thumb">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                                stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="13" r="4" stroke="#fbbf24" stroke-width="1.8"/>
+                        </svg>
+                        <span class="photo-thumb-fish">Karp</span>
+                        <span class="photo-thumb-label">zbliżenie</span>
+                    </div>
+                    <div class="photo-thumb">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                                stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="13" r="4" stroke="#fbbf24" stroke-width="1.8"/>
+                        </svg>
+                        <span class="photo-thumb-fish">Karp</span>
+                        <span class="photo-thumb-label">13:55</span>
+                    </div>
+                    <div class="photo-thumb">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                                stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="13" r="4" stroke="#fbbf24" stroke-width="1.8"/>
+                        </svg>
+                        <span class="photo-thumb-fish">Leszcz</span>
+                        <span class="photo-thumb-label">13:58</span>
+                    </div>
+                    <div class="photo-thumb">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                                stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="13" r="4" stroke="#fbbf24" stroke-width="1.8"/>
+                        </svg>
+                        <span class="photo-thumb-fish">Karaś</span>
+                        <span class="photo-thumb-label">14:20</span>
+                    </div>
+                </div>
+
+                <!-- Oś czasu -->
+                <div class="sect-label">Oś Czasu</div>
+                <div class="timeline">
+
+                    <!-- RZUT 1 -->
+                    <div class="tl-entry">
+                        <div class="tl-dot-col"><div class="tl-dot"></div></div>
+                        <div class="tl-content">
+                            <div class="cast-entry">
+                                <div class="entry-time">06:15 · Rzut 1</div>
+                                <div class="entry-title">Zarzucono wędkę</div>
+                                <div class="entry-tags">
+                                    <span class="entry-tag">Shimano 3.6m / 3.5lb</span>
+                                    <span class="entry-tag">Pellet 10mm</span>
+                                    <span class="entry-tag">Boile kukurydza</span>
+                                    <span class="entry-tag">Łódka zanętowa</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BRANIE 1 – Karp 3,2 kg -->
+                    <div class="tl-entry">
+                        <div class="tl-dot-col"><div class="tl-dot amber"></div></div>
+                        <div class="tl-content">
+                            <div class="catch-entry">
+                                <div class="catch-header">
+                                    <div class="catch-fish-icon">
+                                        <svg width="22" height="14" viewBox="0 0 36 22" fill="none">
+                                            <path d="M2 11 C2 11 8 2 18 4 C26 5.5 32 8 34 11 C32 14 26 16.5 18 18 C8 20 2 11 2 11Z"
+                                                fill="rgba(251,191,36,.7)"/>
+                                            <path d="M34 11 L36 6 M34 11 L36 16"
+                                                stroke="rgba(251,191,36,.7)" stroke-width="1.5" stroke-linecap="round"/>
+                                            <circle cx="10" cy="10" r="1.5" fill="#08080e"/>
+                                        </svg>
+                                    </div>
+                                    <div class="catch-fish-info">
+                                        <div class="catch-fish-name">Karp</div>
+                                        <div class="catch-fish-stats">52 cm · 09:48</div>
+                                    </div>
+                                    <div class="catch-weight-big">3,2 <span class="catch-weight-unit">kg</span></div>
+                                </div>
+                                <div class="catch-detail-row">
+                                    <div class="catch-photo">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                                                stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <circle cx="12" cy="13" r="4" stroke="#fbbf24" stroke-width="1.8"/>
+                                        </svg>
+                                    </div>
+                                    <div class="catch-meta">
+                                        <div class="catch-tackle-chips">
+                                            <span class="catch-tackle-chip">Pellet 10mm</span>
+                                            <span class="catch-tackle-chip">Shimano 3.6m</span>
+                                            <span class="catch-tackle-chip">Karpex #6</span>
+                                        </div>
+                                        <div class="catch-conditions">
+                                            <div class="cond-item">
+                                                <div data-weather-icon="clear-day" data-size="14"></div>
+                                                <span style="margin-left:3px">21°C</span>
+                                            </div>
+                                            <div class="cond-item">
+                                                <div class="cond-icon"><span class="material-icons-outlined">compress</span></div>
+                                                <span>1016 hPa ↑</span>
+                                            </div>
+                                            <span class="cond-solunar">Major</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ZMIANA ZESTAWU -->
+                    <div class="tl-entry">
+                        <div class="tl-dot-col"><div class="tl-dot purple"></div></div>
+                        <div class="tl-content">
+                            <div class="cast-entry">
+                                <div class="entry-time">11:20 · Zmiana zestawu</div>
+                                <div class="entry-title">Zaktualizowano zestaw</div>
+                                <div class="entry-tags">
+                                    <span class="entry-tag change">
+                                        <span class="tag-old">Pellet</span>
+                                        <span class="tag-arrow">→</span>
+                                        <span class="tag-new">Kukurydza</span>
+                                    </span>
+                                    <span class="entry-tag change">
+                                        <span class="tag-old">#6</span>
+                                        <span class="tag-arrow">→</span>
+                                        <span class="tag-new">Haczyk #8</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BRANIE 2 – Karp 4,1 kg -->
+                    <div class="tl-entry">
+                        <div class="tl-dot-col"><div class="tl-dot amber"></div></div>
+                        <div class="tl-content">
+                            <div class="catch-entry">
+                                <div class="catch-header">
+                                    <div class="catch-fish-icon">
+                                        <svg width="22" height="14" viewBox="0 0 36 22" fill="none">
+                                            <path d="M2 11 C2 11 8 2 18 4 C26 5.5 32 8 34 11 C32 14 26 16.5 18 18 C8 20 2 11 2 11Z"
+                                                fill="rgba(251,191,36,.7)"/>
+                                            <path d="M34 11 L36 6 M34 11 L36 16"
+                                                stroke="rgba(251,191,36,.7)" stroke-width="1.5" stroke-linecap="round"/>
+                                            <circle cx="10" cy="10" r="1.5" fill="#08080e"/>
+                                        </svg>
+                                    </div>
+                                    <div class="catch-fish-info">
+                                        <div class="catch-fish-name">Karp</div>
+                                        <div class="catch-fish-stats">58 cm · 13:55</div>
+                                        <div class="catch-fish-nickname">„Wielka Berta"</div>
+                                    </div>
+                                    <div class="catch-weight-big">4,1 <span class="catch-weight-unit">kg</span></div>
+                                </div>
+                                <div class="catch-detail-row">
+                                    <div class="catch-photo">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                                                stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <circle cx="12" cy="13" r="4" stroke="#fbbf24" stroke-width="1.8"/>
+                                        </svg>
+                                    </div>
+                                    <div class="catch-meta">
+                                        <div class="catch-tackle-chips">
+                                            <span class="catch-tackle-chip">Kukurydza</span>
+                                            <span class="catch-tackle-chip">Shimano 3.6m</span>
+                                            <span class="catch-tackle-chip">Haczyk #8</span>
+                                        </div>
+                                        <div class="catch-conditions">
+                                            <div class="cond-item">
+                                                <div data-weather-icon="clear-day" data-size="14"></div>
+                                                <span style="margin-left:3px">23°C</span>
+                                            </div>
+                                            <div class="cond-item">
+                                                <div class="cond-icon"><span class="material-icons-outlined">compress</span></div>
+                                                <span>1017 hPa ↑</span>
+                                            </div>
+                                            <span class="cond-solunar">Major</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BRANIE 3 – Leszcz 0,8 kg -->
+                    <div class="tl-entry">
+                        <div class="tl-dot-col"><div class="tl-dot amber"></div></div>
+                        <div class="tl-content">
+                            <div class="catch-entry">
+                                <div class="catch-header">
+                                    <div class="catch-fish-icon">
+                                        <svg width="22" height="14" viewBox="0 0 36 22" fill="none">
+                                            <path d="M2 11 C2 11 8 3 16 4.5 C24 6 30 9 34 11 C30 13 24 16 16 17.5 C8 19 2 11 2 11Z"
+                                                fill="rgba(251,191,36,.5)"/>
+                                            <path d="M34 11 L36 7 M34 11 L36 15"
+                                                stroke="rgba(251,191,36,.5)" stroke-width="1.5" stroke-linecap="round"/>
+                                            <circle cx="9" cy="10" r="1.3" fill="#08080e"/>
+                                        </svg>
+                                    </div>
+                                    <div class="catch-fish-info">
+                                        <div class="catch-fish-name">Leszcz</div>
+                                        <div class="catch-fish-stats">31 cm · 13:58</div>
+                                    </div>
+                                    <div class="catch-weight-big">0,8 <span class="catch-weight-unit">kg</span></div>
+                                </div>
+                                <div class="catch-detail-row">
+                                    <div class="catch-photo">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                                                stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <circle cx="12" cy="13" r="4" stroke="#fbbf24" stroke-width="1.8"/>
+                                        </svg>
+                                    </div>
+                                    <div class="catch-meta">
+                                        <div class="catch-tackle-chips">
+                                            <span class="catch-tackle-chip">Kukurydza</span>
+                                            <span class="catch-tackle-chip">Shimano 3.6m</span>
+                                        </div>
+                                        <div class="catch-conditions">
+                                            <div class="cond-item">
+                                                <div data-weather-icon="clear-day" data-size="14"></div>
+                                                <span style="margin-left:3px">23°C</span>
+                                            </div>
+                                            <span class="cond-solunar">Major</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BRANIE 4 – Karaś 0,4 kg -->
+                    <div class="tl-entry">
+                        <div class="tl-dot-col"><div class="tl-dot amber"></div></div>
+                        <div class="tl-content">
+                            <div class="catch-entry">
+                                <div class="catch-header">
+                                    <div class="catch-fish-icon">
+                                        <svg width="22" height="14" viewBox="0 0 36 22" fill="none">
+                                            <path d="M4 11 C4 11 9 4 16 5 C23 6 29 9 33 11 C29 13 23 16 16 17 C9 18 4 11 4 11Z"
+                                                fill="rgba(251,191,36,.4)"/>
+                                            <path d="M33 11 L35 7.5 M33 11 L35 14.5"
+                                                stroke="rgba(251,191,36,.4)" stroke-width="1.5" stroke-linecap="round"/>
+                                            <circle cx="10" cy="10.5" r="1.2" fill="#08080e"/>
+                                        </svg>
+                                    </div>
+                                    <div class="catch-fish-info">
+                                        <div class="catch-fish-name">Karaś</div>
+                                        <div class="catch-fish-stats">22 cm · 14:20</div>
+                                    </div>
+                                    <div class="catch-weight-big">0,4 <span class="catch-weight-unit">kg</span></div>
+                                </div>
+                                <div class="catch-detail-row">
+                                    <div class="catch-photo">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                                                stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <circle cx="12" cy="13" r="4" stroke="#fbbf24" stroke-width="1.8"/>
+                                        </svg>
+                                    </div>
+                                    <div class="catch-meta">
+                                        <div class="catch-tackle-chips">
+                                            <span class="catch-tackle-chip">Kukurydza</span>
+                                            <span class="catch-tackle-chip">Haczyk #8</span>
+                                        </div>
+                                        <div class="catch-conditions">
+                                            <div class="cond-item">
+                                                <div data-weather-icon="clear-day" data-size="14"></div>
+                                                <span style="margin-left:3px">22°C</span>
+                                            </div>
+                                            <span class="cond-solunar">Minor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KONIEC SESJI -->
+                    <div class="tl-entry">
+                        <div class="tl-dot-col"><div class="tl-dot grey"></div></div>
+                        <div class="tl-content">
+                            <div class="end-entry">
+                                14:32 · Sesja zakończona · 8 godz. 17 min
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Pogoda i Solunar -->
+                <div class="sect-label">Pogoda i Solunar</div>
+                <div class="weather-summary">
+                    <div class="weather-top-row">
+                        <div class="weather-main-icon">
+                            <div data-weather-icon="clear-day" data-size="36"></div>
+                        </div>
+                        <div class="weather-main-info">
+                            <div class="weather-desc">Słonecznie</div>
+                            <div class="weather-temp-range">Min 14°C · Max 24°C · Odczuwalna 22°C</div>
+                        </div>
+                    </div>
+                    <div class="weather-stats-grid">
+                        <div class="weather-stat-item">
+                            <div class="wsi-icon"><span class="material-icons-outlined">compress</span></div>
+                            <span class="wsi-text">Ciśnienie: </span>
+                            <span class="wsi-val">1016 hPa ↑</span>
+                        </div>
+                        <div class="weather-stat-item">
+                            <div class="wsi-icon"><span class="material-icons-outlined">water_drop</span></div>
+                            <span class="wsi-text">Wilgotność: </span>
+                            <span class="wsi-val">58%</span>
+                        </div>
+                        <div class="weather-stat-item">
+                            <div class="wsi-icon"><span class="material-icons-outlined">air</span></div>
+                            <span class="wsi-text">Wiatr: </span>
+                            <span class="wsi-val">8 km/h SW</span>
+                        </div>
+                        <div class="weather-stat-item">
+                            <div class="wsi-icon"><span class="material-icons-outlined">wb_twilight</span></div>
+                            <span class="wsi-text">Wschód: </span>
+                            <span class="wsi-val">06:48 · Zachód 17:22</span>
+                        </div>
+                    </div>
+                    <div class="solunar-strip">
+                        <div class="solunar-label">Solunar · 21 lutego 2026</div>
+                        <div class="solunar-rows">
+                            <div class="sol-row">
+                                <span class="sol-badge major">Major</span>
+                                <span class="sol-time">10:15 – 11:45</span>
+                                <span class="sol-comment">aktywność podczas sesji</span>
+                            </div>
+                            <div class="sol-row">
+                                <span class="sol-badge major">Major</span>
+                                <span class="sol-time">22:30 – 23:55</span>
+                                <span class="sol-comment">po sesji</span>
+                            </div>
+                            <div class="sol-row">
+                                <span class="sol-badge minor">Minor</span>
+                                <span class="sol-time">04:05 – 05:00</span>
+                                <span class="sol-comment">przed sesją</span>
+                            </div>
+                            <div class="sol-row">
+                                <span class="sol-badge minor">Minor</span>
+                                <span class="sol-time">16:20 – 17:10</span>
+                                <span class="sol-comment">koniec sesji</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scroll-bottom-pad"></div>
+            </div>
+
+            <!-- Active Session Banner -->
+            <div class="session-banner">
+                <div class="banner-dot"></div>
+                <span class="banner-text"><strong>Sesja aktywna</strong> · 3h 42min</span>
+                <div class="banner-arrow">
+                    <span class="material-icons-outlined">chevron_right</span>
+                </div>
+            </div>
+
+            <!-- Nav bar -->
+            <div class="nav-bar">
+                <div class="nav-pill"></div>
+            </div>
+        </div>
+        <p class="phone-meta">390×844 · Ekran 18 · Szczegóły Sesji</p>
+    </div>
+    <script>
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 60;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+</body>
+
+</html>

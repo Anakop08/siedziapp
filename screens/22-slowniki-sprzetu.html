@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEDZI! – 22 Słowniki Sprzętu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { overflow: hidden; height: 100%; }
+
+        body {
+            background: #0a0a0c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+
+        .screen-label {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .state-btns {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .state-btn {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #333;
+            color: #888;
+            background: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .state-btn.active {
+            background: rgba(156,163,175,.15);
+            border-color: #9ca3af;
+            color: #9ca3af;
+        }
+
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center center;
+        }
+
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #0e0e12;
+            border-radius: 52px;
+            box-shadow: 0 0 0 2px #2a2a2e, 0 0 0 5px #1a1a1e,
+                0 30px 80px rgba(0,0,0,.85), inset 0 0 0 1px #242428;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            right: -3px; top: 140px;
+            width: 3px; height: 60px;
+            background: #2a2a2e;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            left: -3px; top: 120px;
+            width: 3px; height: 36px;
+            background: #2a2a2e;
+            border-radius: 3px 0 0 3px;
+            box-shadow: 0 44px 0 #2a2a2e, 0 86px 0 #2a2a2e;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px; left: 50%;
+            transform: translateX(-50%);
+            width: 120px; height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        /* Status bar */
+        .status-bar {
+            height: 44px;
+            padding: 14px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
+            background: #0e0e12;
+        }
+        .status-bar .time { font-size: 14px; font-weight: 600; color: #e0e0e0; }
+        .status-icons { display: flex; gap: 6px; align-items: center; }
+        .status-icons svg { fill: #e0e0e0; }
+
+        /* Top bar */
+        .top-bar {
+            padding: 10px 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0e0e12;
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.05);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .back-btn svg { stroke: rgba(255,255,255,.6); }
+
+        .top-title { flex: 1; font-size: 18px; font-weight: 600; color: #fff; }
+
+        .top-icon-btn {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.05);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .top-icon-btn .material-icons-outlined { font-size: 20px; color: rgba(255,255,255,.6); }
+
+        .add-btn {
+            height: 36px;
+            padding: 0 14px;
+            border-radius: 18px;
+            background: rgba(156,163,175,.15);
+            border: 1px solid rgba(156,163,175,.3);
+            display: flex; align-items: center; gap: 5px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .add-btn .material-icons-outlined { font-size: 18px; color: #9ca3af; }
+        .add-btn span.add-label { font-size: 13px; font-weight: 600; color: #9ca3af; }
+
+        /* Tabs */
+        .tabs-bar {
+            padding: 10px 16px 0;
+            display: flex;
+            gap: 0;
+            background: #0e0e12;
+            flex-shrink: 0;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 9px 8px 10px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,.4);
+            cursor: pointer;
+            position: relative;
+            transition: color .15s;
+        }
+
+        .tab.active {
+            color: #9ca3af;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 16%; right: 16%;
+            height: 2px;
+            background: #9ca3af;
+            border-radius: 1px 1px 0 0;
+        }
+
+        .tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.08);
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255,255,255,.5);
+        }
+
+        .tab.active .tab-badge {
+            background: rgba(156,163,175,.2);
+            color: #9ca3af;
+        }
+
+        /* Scrollable body */
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            padding: 12px 16px 4px;
+        }
+        .screen-body::-webkit-scrollbar { display: none; }
+
+        /* ---- STATES ---- */
+        .state { display: none; }
+        .state.visible { display: block; }
+
+        /* ---- LIST VIEW ---- */
+        .list-info {
+            font-size: 11px;
+            color: rgba(255,255,255,.4);
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .dict-card {
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .dict-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px 10px;
+        }
+
+        .dict-icon-box {
+            width: 38px; height: 38px;
+            border-radius: 11px;
+            background: rgba(107,114,128,.15);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .dict-icon-box .material-icons-outlined {
+            font-size: 20px; width: 20px; height: 20px; line-height: 20px;
+            color: #9ca3af;
+        }
+
+        .dict-main { flex: 1; }
+
+        .dict-name {
+            font-size: 14px; font-weight: 600;
+            color: rgba(255,255,255,.9);
+        }
+
+        .dict-meta {
+            font-size: 11px;
+            color: rgba(255,255,255,.4);
+            margin-top: 2px;
+        }
+
+        .dict-edit-btn {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.05);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .dict-edit-btn .material-icons-outlined {
+            font-size: 17px; width: 17px; height: 17px; line-height: 17px;
+            color: rgba(255,255,255,.35);
+        }
+
+        /* Chips row */
+        .chips-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 0 14px 13px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px 3px 7px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255,255,255,.65);
+        }
+
+        .chip .material-icons-outlined {
+            font-size: 12px; width: 12px; height: 12px; line-height: 12px;
+            overflow: hidden;
+        }
+
+        .chip-rod   { background: rgba(14,116,144,.12); border: 1px solid rgba(14,116,144,.2); }
+        .chip-rod .material-icons-outlined { color: #22d3ee; }
+        .chip-bait  { background: rgba(217,119,6,.1);  border: 1px solid rgba(217,119,6,.2); }
+        .chip-bait .material-icons-outlined { color: #fbbf24; }
+        .chip-hook  { background: rgba(107,114,128,.12); border: 1px solid rgba(107,114,128,.2); }
+        .chip-hook .material-icons-outlined { color: #9ca3af; }
+        .chip-line  { background: rgba(5,150,105,.1); border: 1px solid rgba(5,150,105,.2); }
+        .chip-line .material-icons-outlined { color: #34d399; }
+
+        /* Card separator top */
+        .dict-card.active-card {
+            border-color: rgba(156,163,175,.25);
+            background: rgba(55,65,81,.1);
+        }
+
+        .active-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(52,211,153,.1);
+            border: 1px solid rgba(52,211,153,.25);
+            color: #34d399;
+            margin-bottom: 10px;
+        }
+
+        .active-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 5px rgba(52,211,153,.5);
+        }
+
+        /* Expand row */
+        .expand-row {
+            display: flex;
+            align-items: center;
+            padding: 0 14px 12px;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .expand-row span.expand-txt {
+            font-size: 11px;
+            color: rgba(255,255,255,.35);
+        }
+
+        .expand-row .material-icons-outlined {
+            font-size: 14px; width: 14px; height: 14px; line-height: 14px;
+            color: rgba(255,255,255,.25);
+        }
+
+        /* Expanded details */
+        .card-details {
+            border-top: 1px solid rgba(255,255,255,.05);
+            padding: 11px 14px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .detail-key {
+            font-size: 11px;
+            color: rgba(255,255,255,.4);
+            flex-shrink: 0;
+        }
+
+        .detail-val {
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255,255,255,.7);
+            text-align: right;
+        }
+
+        /* Delete button */
+        .card-footer {
+            border-top: 1px solid rgba(255,255,255,.05);
+            display: flex;
+            padding: 10px 14px;
+            justify-content: flex-end;
+        }
+
+        .delete-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            background: rgba(220,38,38,.08);
+            border: 1px solid rgba(220,38,38,.15);
+            cursor: pointer;
+        }
+        .delete-btn .material-icons-outlined { font-size: 15px; color: #f87171; }
+        .delete-btn span { font-size: 11px; font-weight: 500; color: #f87171; }
+
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 24px;
+            gap: 10px;
+        }
+        .empty-state .material-icons-outlined { font-size: 44px; color: rgba(255,255,255,.12); }
+        .empty-state p { font-size: 13px; color: rgba(255,255,255,.3); text-align: center; }
+
+        /* ---- ADD FORM STATE ---- */
+        .form-scroll { display: none; flex: 1; overflow-y: auto; scrollbar-width: none; }
+        .form-scroll::-webkit-scrollbar { display: none; }
+        .form-scroll.visible { display: block; }
+
+        .form-section-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.4);
+            padding: 14px 16px 6px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 16px;
+        }
+
+        .field-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field-label {
+            font-size: 11px;
+            color: rgba(255,255,255,.5);
+            padding-left: 2px;
+        }
+
+        .field-input {
+            background: rgba(255,255,255,.04);
+            border: 1.5px solid rgba(255,255,255,.1);
+            border-radius: 14px;
+            padding: 11px 14px;
+            font-size: 14px;
+            color: rgba(255,255,255,.85);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .field-input.filled {
+            border-color: rgba(156,163,175,.35);
+            background: rgba(55,65,81,.12);
+            color: rgba(255,255,255,.9);
+        }
+
+        .field-input.active-field {
+            border-color: rgba(156,163,175,.5);
+            background: rgba(156,163,175,.05);
+        }
+
+        .field-placeholder { color: rgba(255,255,255,.3); font-size: 14px; }
+
+        .field-input .material-icons-outlined {
+            font-size: 18px; color: rgba(255,255,255,.25);
+        }
+
+        .field-row {
+            display: flex;
+            gap: 8px;
+        }
+        .field-row .field-wrap { flex: 1; }
+
+        /* Toggle row */
+        .toggle-group {
+            padding: 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 14px;
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 14px;
+        }
+
+        .toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-left .material-icons-outlined { font-size: 20px; color: rgba(255,255,255,.4); }
+        .toggle-label { font-size: 14px; color: rgba(255,255,255,.75); }
+
+        .toggle-track {
+            width: 44px; height: 24px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.1);
+            border: 1.5px solid rgba(255,255,255,.15);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .toggle-track .thumb {
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.35);
+            transition: left .2s;
+        }
+
+        /* CTA wrap */
+        .cta-wrap {
+            padding: 10px 16px 8px;
+            flex-shrink: 0;
+            background: #0e0e12;
+        }
+
+        .cta-btn {
+            width: 100%;
+            height: 54px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #374151, #4b5563);
+            border: 1px solid rgba(156,163,175,.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .cta-icon-box {
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.1);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cta-icon-box .material-icons-outlined { font-size: 18px; color: #fff; }
+
+        .cta-text { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.2px; }
+
+        .cta-arrow {
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            background: rgba(255,255,255,.12);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cta-arrow .material-icons-outlined { font-size: 16px; color: rgba(255,255,255,.7); }
+
+        /* Active Session Banner */
+        .session-banner {
+            margin: 0 16px 6px;
+            padding: 9px 14px;
+            background: rgba(14,116,144,.18);
+            border: 1px solid rgba(34,211,238,.25);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .banner-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #22d3ee;
+            box-shadow: 0 0 8px rgba(34,211,238,.6);
+            flex-shrink: 0;
+        }
+
+        .banner-text {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255,255,255,.8);
+        }
+
+        .banner-text strong { color: #22d3ee; }
+
+        .banner-arrow .material-icons-outlined {
+            font-size: 16px; color: rgba(34,211,238,.6);
+        }
+
+        /* Nav bar */
+        .nav-bar {
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .nav-pill {
+            width: 100px; height: 4px;
+            background: rgba(255,255,255,.27);
+            border-radius: 2px;
+        }
+
+        .phone-meta {
+            color: #444;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <p class="screen-label">SIEDZI! · Ekran 22 / 26 · Słowniki Sprzętu</p>
+    <div class="state-btns">
+        <button class="state-btn active" onclick="setState('list')">Lista słownika</button>
+        <button class="state-btn" onclick="setState('add')">Dodaj nowy zestaw</button>
+    </div>
+    <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+            <div class="dynamic-island"></div>
+
+            <!-- Status bar -->
+            <div class="status-bar">
+                <span class="time">19:12</span>
+                <div class="status-icons">
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <rect x="0" y="8" width="3" height="4" rx="0.5"/>
+                        <rect x="4" y="5" width="3" height="7" rx="0.5"/>
+                        <rect x="8" y="2" width="3" height="10" rx="0.5"/>
+                        <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.35"/>
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12">
+                        <path d="M8 9.5 A0.8 0.8 0 1 1 8 11.1 A0.8 0.8 0 0 1 8 9.5Z"/>
+                        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#e0e0e0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                        <path d="M1.5 4.0 Q8 -0.5 14.5 4.0" stroke="#e0e0e0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                    </svg>
+                    <svg width="22" height="12" viewBox="0 0 22 12">
+                        <rect x="0" y="1" width="18" height="10" rx="2" stroke="#e0e0e0" stroke-width="1.2" fill="none"/>
+                        <rect x="18.5" y="3.5" width="2.5" height="5" rx="1" fill="#e0e0e0" opacity="0.6"/>
+                        <rect x="1.5" y="2.5" width="13" height="7" rx="1.2" fill="#e0e0e0"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Top bar -->
+            <div class="top-bar">
+                <div class="back-btn">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 12H5m0 0 7-7m-7 7 7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="top-title">Słowniki Sprzętu</div>
+                <div class="top-icon-btn">
+                    <span class="material-icons-outlined">search</span>
+                </div>
+                <div class="add-btn" onclick="setState('add')">
+                    <span class="material-icons-outlined">add</span>
+                    <span class="add-label">Dodaj</span>
+                </div>
+            </div>
+
+            <!-- Tabs bar -->
+            <div class="tabs-bar">
+                <div class="tab active" id="tab-zestawy" onclick="setTab('zestawy')">
+                    Zestawy <span class="tab-badge">12</span>
+                </div>
+                <div class="tab" id="tab-przynety" onclick="setTab('przynety')">
+                    Przynęty <span class="tab-badge">24</span>
+                </div>
+                <div class="tab" id="tab-haczyki" onclick="setTab('haczyki')">
+                    Haczyki <span class="tab-badge">18</span>
+                </div>
+            </div>
+
+            <!-- ====== LIST STATE ====== -->
+            <div class="screen-body" id="state-list">
+
+                <!-- Zestawy tab content -->
+                <div id="content-zestawy" class="state visible">
+                    <p class="list-info">12 zestawów wędkarskich · Używane w Formularzu Zasadzki</p>
+
+                    <!-- Card 1 – active (currently in use) -->
+                    <div class="dict-card active-card">
+                        <div style="padding: 10px 14px 0;">
+                            <div class="active-badge">
+                                <div class="active-dot"></div>
+                                Aktualnie zarzucony
+                            </div>
+                        </div>
+                        <div class="dict-card-header">
+                            <div class="dict-icon-box">
+                                <span class="material-icons-outlined">phishing</span>
+                            </div>
+                            <div class="dict-main">
+                                <div class="dict-name">Zestaw Karpiowy #1</div>
+                                <div class="dict-meta">18 użyć · ostatnio dziś</div>
+                            </div>
+                            <div class="dict-edit-btn">
+                                <span class="material-icons-outlined">edit</span>
+                            </div>
+                        </div>
+                        <div class="chips-row">
+                            <div class="chip chip-rod"><span class="material-icons-outlined">phishing</span>Shimano 12ft 3.5lb</div>
+                            <div class="chip chip-bait"><span class="material-icons-outlined">circle</span>Boile Truskawka 20mm</div>
+                            <div class="chip chip-hook"><span class="material-icons-outlined">hardware</span>Haczyk #4 Karp</div>
+                            <div class="chip chip-line"><span class="material-icons-outlined">linear_scale</span>Monofilament 0.35mm</div>
+                        </div>
+                        <div class="expand-row" onclick="toggleDetails('card1')">
+                            <span class="material-icons-outlined" id="arrow-card1">expand_more</span>
+                            <span class="expand-txt" id="expand-txt-card1">Pokaż pełne ustawienia</span>
+                        </div>
+                        <div class="card-details" id="details-card1" style="display:none;">
+                            <div class="detail-row">
+                                <span class="detail-key">Kołowrotek</span>
+                                <span class="detail-val">Daiwa Emcast 5000</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Żyłka</span>
+                                <span class="detail-val">Monofilament 0.35mm / 12lb</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Przynęta</span>
+                                <span class="detail-val">Boile Truskawka 20mm</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Zanęta</span>
+                                <span class="detail-val">Pellet Karpiowy 6mm</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Haczyk</span>
+                                <span class="detail-val">#4 ESP Carp Wide Gape</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Osprzęt</span>
+                                <span class="detail-val">Klipsy + krętlik karabińczyk</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Łódka zanętowa</span>
+                                <span class="detail-val">Tak</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Echosonda</span>
+                                <span class="detail-val">Tak (Deeper Pro+)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="dict-card">
+                        <div class="dict-card-header">
+                            <div class="dict-icon-box">
+                                <span class="material-icons-outlined">phishing</span>
+                            </div>
+                            <div class="dict-main">
+                                <div class="dict-name">Zestaw Sumowy</div>
+                                <div class="dict-meta">6 użyć · ostatnio 14 dni temu</div>
+                            </div>
+                            <div class="dict-edit-btn">
+                                <span class="material-icons-outlined">edit</span>
+                            </div>
+                        </div>
+                        <div class="chips-row">
+                            <div class="chip chip-rod"><span class="material-icons-outlined">phishing</span>Daiwa 14ft 5lb</div>
+                            <div class="chip chip-bait"><span class="material-icons-outlined">set_meal</span>Martwa rybka</div>
+                            <div class="chip chip-hook"><span class="material-icons-outlined">hardware</span>Haczyk #1/0 Suma</div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="dict-card">
+                        <div class="dict-card-header">
+                            <div class="dict-icon-box">
+                                <span class="material-icons-outlined">phishing</span>
+                            </div>
+                            <div class="dict-main">
+                                <div class="dict-name">Spinning UL Bass</div>
+                                <div class="dict-meta">11 użyć · ostatnio 3 tyg. temu</div>
+                            </div>
+                            <div class="dict-edit-btn">
+                                <span class="material-icons-outlined">edit</span>
+                            </div>
+                        </div>
+                        <div class="chips-row">
+                            <div class="chip chip-rod"><span class="material-icons-outlined">phishing</span>Shimano UL 7ft</div>
+                            <div class="chip chip-bait"><span class="material-icons-outlined">circle</span>Twister 8cm</div>
+                            <div class="chip chip-line"><span class="material-icons-outlined">linear_scale</span>Plecionka 0.12mm</div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="dict-card">
+                        <div class="dict-card-header">
+                            <div class="dict-icon-box">
+                                <span class="material-icons-outlined">phishing</span>
+                            </div>
+                            <div class="dict-main">
+                                <div class="dict-name">Feeder Standard</div>
+                                <div class="dict-meta">9 użyć · ostatnio 5 tyg. temu</div>
+                            </div>
+                            <div class="dict-edit-btn">
+                                <span class="material-icons-outlined">edit</span>
+                            </div>
+                        </div>
+                        <div class="chips-row">
+                            <div class="chip chip-rod"><span class="material-icons-outlined">phishing</span>Okuma 11ft 120g</div>
+                            <div class="chip chip-bait"><span class="material-icons-outlined">circle</span>Ochotka</div>
+                            <div class="chip chip-hook"><span class="material-icons-outlined">hardware</span>Haczyk #12 Method</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Przynęty tab content -->
+                <div id="content-przynety" class="state">
+                    <p class="list-info">24 pozycje · Przynęty i zanęty</p>
+                    <div class="dict-card">
+                        <div class="dict-card-header">
+                            <div class="dict-icon-box" style="background: rgba(217,119,6,.12);">
+                                <span class="material-icons-outlined" style="color:#fbbf24;">circle</span>
+                            </div>
+                            <div class="dict-main">
+                                <div class="dict-name">Boile Truskawka 20mm</div>
+                                <div class="dict-meta">Przynęta · używana 18 razy</div>
+                            </div>
+                            <div class="dict-edit-btn"><span class="material-icons-outlined">edit</span></div>
+                        </div>
+                    </div>
+                    <div class="dict-card">
+                        <div class="dict-card-header">
+                            <div class="dict-icon-box" style="background: rgba(217,119,6,.12);">
+                                <span class="material-icons-outlined" style="color:#fbbf24;">set_meal</span>
+                            </div>
+                            <div class="dict-main">
+                                <div class="dict-name">Pellet Karpiowy 6mm</div>
+                                <div class="dict-meta">Zanęta · używana 14 razy</div>
+                            </div>
+                            <div class="dict-edit-btn"><span class="material-icons-outlined">edit</span></div>
+                        </div>
+                    </div>
+                    <div class="dict-card">
+                        <div class="dict-card-header">
+                            <div class="dict-icon-box" style="background: rgba(217,119,6,.12);">
+                                <span class="material-icons-outlined" style="color:#fbbf24;">water</span>
+                            </div>
+                            <div class="dict-main">
+                                <div class="dict-name">Ochotka (świeża)</div>
+                                <div class="dict-meta">Przynęta · używana 9 razy</div>
+                            </div>
+                            <div class="dict-edit-btn"><span class="material-icons-outlined">edit</span></div>
+                        </div>
+                    </div>
+                    <div class="empty-state" style="padding-top:20px;">
+                        <p>i 21 kolejnych pozycji…</p>
+                    </div>
+                </div>
+
+                <!-- Haczyki tab content -->
+                <div id="content-haczyki" class="state">
+                    <p class="list-info">18 pozycji · Haczyki, klipsy, osprzęt</p>
+                    <div class="dict-card">
+                        <div class="dict-card-header">
+                            <div class="dict-icon-box">
+                                <span class="material-icons-outlined">hardware</span>
+                            </div>
+                            <div class="dict-main">
+                                <div class="dict-name">ESP Carp Wide Gape #4</div>
+                                <div class="dict-meta">Haczyk · używany 18 razy</div>
+                            </div>
+                            <div class="dict-edit-btn"><span class="material-icons-outlined">edit</span></div>
+                        </div>
+                    </div>
+                    <div class="dict-card">
+                        <div class="dict-card-header">
+                            <div class="dict-icon-box">
+                                <span class="material-icons-outlined">hardware</span>
+                            </div>
+                            <div class="dict-main">
+                                <div class="dict-name">Karabińczyk z krętlikiem</div>
+                                <div class="dict-meta">Osprzęt · używany 23 razy</div>
+                            </div>
+                            <div class="dict-edit-btn"><span class="material-icons-outlined">edit</span></div>
+                        </div>
+                    </div>
+                    <div class="empty-state" style="padding-top:20px;">
+                        <p>i 16 kolejnych pozycji…</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ====== ADD FORM STATE ====== -->
+            <div class="form-scroll" id="state-add">
+                <div class="form-section-label">Podstawowe</div>
+                <div class="form-group">
+                    <div class="field-wrap">
+                        <span class="field-label">Nazwa zestawu *</span>
+                        <div class="field-input active-field">
+                            <span style="color:rgba(255,255,255,.85);">Zestaw Karpiowy #3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-label">Wędka i Kołowrotek</div>
+                <div class="form-group">
+                    <div class="field-row">
+                        <div class="field-wrap">
+                            <span class="field-label">Wędka</span>
+                            <div class="field-input filled" style="justify-content:space-between;">
+                                <span>Shimano TX-4</span>
+                                <span class="material-icons-outlined">arrow_drop_down</span>
+                            </div>
+                        </div>
+                        <div class="field-wrap" style="max-width: 100px;">
+                            <span class="field-label">Klasa (lb)</span>
+                            <div class="field-input filled">
+                                <span>3.5 lb</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-wrap">
+                            <span class="field-label">Kołowrotek</span>
+                            <div class="field-input">
+                                <span class="field-placeholder">Wybierz lub wpisz…</span>
+                                <span class="material-icons-outlined">arrow_drop_down</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-wrap">
+                            <span class="field-label">Żyłka / plecionka</span>
+                            <div class="field-input">
+                                <span class="field-placeholder">Wybierz lub wpisz…</span>
+                                <span class="material-icons-outlined">arrow_drop_down</span>
+                            </div>
+                        </div>
+                        <div class="field-wrap" style="max-width: 100px;">
+                            <span class="field-label">Grubość</span>
+                            <div class="field-input">
+                                <span class="field-placeholder">0.00 mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-label">Przynęta i Zanęta</div>
+                <div class="form-group">
+                    <div class="field-wrap">
+                        <span class="field-label">Przynęta</span>
+                        <div class="field-input filled" style="justify-content:space-between;">
+                            <span>Boile Truskawka 20mm</span>
+                            <span class="material-icons-outlined">arrow_drop_down</span>
+                        </div>
+                    </div>
+                    <div class="field-wrap">
+                        <span class="field-label">Zanęta</span>
+                        <div class="field-input">
+                            <span class="field-placeholder">Wybierz lub wpisz…</span>
+                            <span class="material-icons-outlined">arrow_drop_down</span>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-wrap">
+                            <span class="field-label">Haczyk</span>
+                            <div class="field-input">
+                                <span class="field-placeholder">Wybierz lub wpisz…</span>
+                                <span class="material-icons-outlined">arrow_drop_down</span>
+                            </div>
+                        </div>
+                        <div class="field-wrap" style="max-width: 80px;">
+                            <span class="field-label">Rozmiar</span>
+                            <div class="field-input">
+                                <span class="field-placeholder">#–</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-wrap">
+                        <span class="field-label">Osprzęt (klipsy, krętliki…)</span>
+                        <div class="field-input">
+                            <span class="field-placeholder">Opcjonalnie…</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-label">Wyposażenie dodatkowe</div>
+                <div class="toggle-group">
+                    <div class="toggle-row">
+                        <div class="toggle-left">
+                            <span class="material-icons-outlined">rowing</span>
+                            <span class="toggle-label">Łódka zanętowa</span>
+                        </div>
+                        <div class="toggle-track">
+                            <div class="thumb"></div>
+                        </div>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-left">
+                            <span class="material-icons-outlined">router</span>
+                            <span class="toggle-label">Echosonda</span>
+                        </div>
+                        <div class="toggle-track">
+                            <div class="thumb"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="height: 16px;"></div>
+            </div>
+
+            <!-- CTA (only in add state) -->
+            <div class="cta-wrap" id="cta-add" style="display:none;">
+                <div class="cta-btn">
+                    <div class="cta-icon-box">
+                        <span class="material-icons-outlined">save</span>
+                    </div>
+                    <span class="cta-text">Zapisz zestaw</span>
+                    <div class="cta-arrow">
+                        <span class="material-icons-outlined">chevron_right</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Session Banner -->
+            <div class="session-banner">
+                <div class="banner-dot"></div>
+                <span class="banner-text"><strong>Sesja aktywna</strong> · 3h 42min</span>
+                <div class="banner-arrow">
+                    <span class="material-icons-outlined">chevron_right</span>
+                </div>
+            </div>
+
+            <!-- Nav bar -->
+            <div class="nav-bar">
+                <div class="nav-pill"></div>
+            </div>
+        </div>
+        <p class="phone-meta">390×844 · Ekran 22 · Słowniki Sprzętu</p>
+    </div>
+
+    <script>
+        var currentState = 'list';
+        var currentTab = 'zestawy';
+
+        function setState(s) {
+            currentState = s;
+            var listEl = document.getElementById('state-list');
+            var addEl = document.getElementById('state-add');
+            var ctaEl = document.getElementById('cta-add');
+
+            if (s === 'list') {
+                listEl.style.display = 'block';
+                addEl.classList.remove('visible');
+                ctaEl.style.display = 'none';
+            } else {
+                listEl.style.display = 'none';
+                addEl.classList.add('visible');
+                ctaEl.style.display = 'block';
+            }
+
+            document.querySelectorAll('.state-btn').forEach(function(b, i) {
+                b.classList.toggle('active', (i === 0 && s === 'list') || (i === 1 && s === 'add'));
+            });
+        }
+
+        function setTab(tab) {
+            currentTab = tab;
+            ['zestawy', 'przynety', 'haczyki'].forEach(function(t) {
+                document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+                document.getElementById('content-' + t).classList.toggle('visible', t === tab);
+            });
+        }
+
+        function toggleDetails(id) {
+            var el = document.getElementById('details-' + id);
+            var arrow = document.getElementById('arrow-' + id);
+            var txt = document.getElementById('expand-txt-' + id);
+            if (el.style.display === 'none') {
+                el.style.display = 'block';
+                arrow.textContent = 'expand_less';
+                txt.textContent = 'Zwiń ustawienia';
+            } else {
+                el.style.display = 'none';
+                arrow.textContent = 'expand_more';
+                txt.textContent = 'Pokaż pełne ustawienia';
+            }
+        }
+
+        function autoScale() {
+            var wrap = document.getElementById('phoneWrap');
+            var headerH = 90;
+            var contentH = 870;
+            var availH = window.innerHeight - headerH;
+            var availW = window.innerWidth - 40;
+            var scale = Math.min(availH / contentH, availW / 400, 1);
+            wrap.style.transform = 'scale(' + scale + ')';
+            wrap.style.transformOrigin = 'center center';
+            wrap.style.marginBottom = Math.round((844 * scale - 844) / 2) + 'px';
+        }
+        window.addEventListener('resize', autoScale);
+        window.addEventListener('load', autoScale);
+    </script>
+</body>
+</html>
