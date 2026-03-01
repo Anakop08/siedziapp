@@ -23,8 +23,10 @@ data class SessionCardState(
     val endTime: Long? = null,
     val catchCount: Int = 0,
     val totalWeightKg: Double = 0.0,
+    val maxLengthCm: Int? = null,
     val speciesIds: List<String> = emptyList(),
-    val speciesNames: Map<String, String> = emptyMap()
+    val speciesNames: Map<String, String> = emptyMap(),
+    val speciesCounts: Map<String, Int> = emptyMap()
 )
 
 @HiltViewModel
@@ -48,8 +50,10 @@ class SessionCardViewModel @Inject constructor(
             val catches = catchDao.getBySessionId(sessionId).first()
 
             val weight = catches.sumOf { it.weightKg }
+            val maxLength = catches.mapNotNull { it.lengthCm }.maxOrNull()
             val speciesIds = catches.map { it.speciesId }.distinct()
             val speciesNames = mutableMapOf<String, String>()
+            val speciesCounts = catches.groupingBy { it.speciesId }.eachCount()
             speciesIds.forEach { id ->
                 fishSpeciesDao.getById(id)?.let { speciesNames[id] = it.name }
             }
@@ -60,8 +64,10 @@ class SessionCardViewModel @Inject constructor(
                 endTime = session.endTime,
                 catchCount = catches.size,
                 totalWeightKg = weight,
+                maxLengthCm = maxLength,
                 speciesIds = speciesIds,
-                speciesNames = speciesNames
+                speciesNames = speciesNames,
+                speciesCounts = speciesCounts
             )
         }
     }

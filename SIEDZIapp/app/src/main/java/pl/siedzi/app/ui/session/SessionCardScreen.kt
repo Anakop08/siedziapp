@@ -30,6 +30,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import pl.siedzi.app.ui.components.SpeciesTagCloud
+import pl.siedzi.app.ui.components.SpeciesTagItem
 import pl.siedzi.app.ui.theme.CyanTeal
 import pl.siedzi.app.ui.theme.EmeraldGreen
 import pl.siedzi.app.ui.theme.TealDark
@@ -164,9 +166,16 @@ fun SessionCardScreen(
                     value = "%.1f".format(state.totalWeightKg),
                     label = "kg"
                 )
+                if (state.maxLengthCm != null) {
+                    StatCard(
+                        modifier = Modifier.weight(1f),
+                        value = state.maxLengthCm.toString(),
+                        label = "cm max"
+                    )
+                }
             }
 
-            if (state.speciesNames.isNotEmpty()) {
+            if (state.speciesIds.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "GATUNKI",
@@ -174,26 +183,18 @@ fun SessionCardScreen(
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.White.copy(alpha = 0.55f)
                 )
-                Row(
+                SpeciesTagCloud(
+                    speciesItems = state.speciesIds.map { id ->
+                        SpeciesTagItem(
+                            speciesId = id,
+                            name = state.speciesNames[id] ?: id,
+                            count = state.speciesCounts[id] ?: 1
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    state.speciesIds.forEach { id ->
-                        val name = state.speciesNames[id] ?: id
-                        androidx.compose.material3.SuggestionChip(
-                            onClick = { },
-                            label = { Text(name) },
-                            modifier = Modifier,
-                            colors = androidx.compose.material3.SuggestionChipDefaults.suggestionChipColors(
-                                containerColor = CyanTeal.copy(alpha = 0.15f),
-                                labelColor = CyanTeal
-                            )
-                        )
-                    }
-                }
+                        .padding(horizontal = 16.dp)
+                )
             }
 
             if (state.catchCount == 0) {
