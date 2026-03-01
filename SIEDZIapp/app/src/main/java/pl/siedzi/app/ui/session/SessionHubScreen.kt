@@ -1,7 +1,9 @@
 package pl.siedzi.app.ui.session
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,10 +23,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import pl.siedzi.app.ui.theme.CyanTeal
 
 /**
  * Hub sesji – główny ekran aktywnej sesji nad wodą.
@@ -34,12 +44,14 @@ import androidx.compose.ui.unit.dp
 fun SessionHubScreen(
     sessionId: String,
     fisheryName: String,
+    endSessionStats: Pair<Int, Double>,
     onNavigateToTackleForm: () -> Unit,
     onNavigateToTimeline: () -> Unit,
     onNavigateToChangeSetup: () -> Unit,
     onEndSession: () -> Unit,
     onBack: () -> Unit
 ) {
+    var showEndDialog by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -120,7 +132,7 @@ fun SessionHubScreen(
             }
             Spacer(modifier = Modifier.height(32.dp))
             OutlinedButton(
-                onClick = onEndSession,
+                onClick = { showEndDialog = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Default.Stop, contentDescription = null)
@@ -129,4 +141,69 @@ fun SessionHubScreen(
             }
         }
     }
+
+    if (showEndDialog) {
+        EndSessionDialog(
+            fisheryName = fisheryName,
+            catchCount = endSessionStats.first,
+            weightKg = endSessionStats.second,
+            onConfirm = {
+                showEndDialog = false
+                onEndSession()
+            },
+            onDismiss = { showEndDialog = false }
+        )
+    }
+}
+
+@Composable
+private fun EndSessionDialog(
+    fisheryName: String,
+    catchCount: Int,
+    weightKg: Double,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Zakończyć sesję?") },
+        text = {
+            Column {
+                Text("Sesja na łowisku $fisheryName zostanie zakończona.")
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = catchCount.toString(),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = CyanTeal
+                        )
+                        Text("połowów", style = MaterialTheme.typography.labelSmall)
+                    }
+                    Spacer(modifier = Modifier.padding(horizontal = 24.dp))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "%.1f".format(weightKg),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = CyanTeal
+                        )
+                        Text("kg", style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Tak, zakończ", color = CyanTeal)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Nie")
+            }
+        }
+    )
 }

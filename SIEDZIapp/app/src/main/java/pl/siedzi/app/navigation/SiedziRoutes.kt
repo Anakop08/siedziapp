@@ -46,4 +46,7 @@ sealed class SiedziRoute(val path: String) {
     data object CatchCard : SiedziRoute("catch_card/{sessionId}") {
         fun create(sessionId: String) = "catch_card/$sessionId"
     }
+    data object SessionCard : SiedziRoute("session_card/{sessionId}") {
+        fun create(sessionId: String) = "session_card/$sessionId"
+    }
 }

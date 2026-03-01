@@ -34,6 +34,8 @@ import pl.siedzi.app.ui.planning.PlanningFlowScreen
 import pl.siedzi.app.ui.planning.PlanningViewModel
 import pl.siedzi.app.ui.placeholder.PlaceholderScreen
 import pl.siedzi.app.ui.session.CheckInScreen
+import pl.siedzi.app.ui.session.SessionCardScreen
+import pl.siedzi.app.ui.session.SessionCardViewModel
 import pl.siedzi.app.ui.session.SessionHubScreen
 import pl.siedzi.app.ui.session.SessionHubViewModel
 import pl.siedzi.app.ui.tackle.TackleFormScreen
@@ -281,10 +283,12 @@ fun SiedziNavGraph() {
             val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
             val viewModel: SessionHubViewModel = hiltViewModel()
             val fisheryName by viewModel.fisheryName.collectAsState()
+            val endSessionStats by viewModel.endSessionStats.collectAsState()
 
             SessionHubScreen(
                 sessionId = sessionId,
                 fisheryName = fisheryName,
+                endSessionStats = endSessionStats,
                 onNavigateToTackleForm = {
                     navController.navigate(SiedziRoute.TackleForm.create(sessionId))
                 },
@@ -296,7 +300,7 @@ fun SiedziNavGraph() {
                 },
                 onEndSession = {
                     viewModel.endSession {
-                        navController.navigate(SiedziRoute.Dashboard.path) {
+                        navController.navigate(SiedziRoute.SessionCard.create(sessionId)) {
                             popUpTo(SiedziRoute.Dashboard.path) { inclusive = false }
                             launchSingleTop = true
                         }
@@ -430,6 +434,23 @@ fun SiedziNavGraph() {
                     }
                 },
                 onBack = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = SiedziRoute.SessionCard.path,
+            arguments = listOf(navArgument("sessionId") { type = NavType.StringType })
+        ) {
+            val viewModel: SessionCardViewModel = hiltViewModel()
+            val state by viewModel.state.collectAsState()
+
+            SessionCardScreen(
+                state = state,
+                onBack = {
+                    navController.navigate(SiedziRoute.Dashboard.path) {
+                        popUpTo(SiedziRoute.Dashboard.path) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
     }
