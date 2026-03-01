@@ -19,6 +19,10 @@ import androidx.navigation.navArgument
 import androidx.hilt.navigation.compose.hiltViewModel
 import pl.siedzi.app.ui.dashboard.DashboardScreen
 import pl.siedzi.app.ui.disclaimer.DisclaimerScreen
+import pl.siedzi.app.ui.gallery.GalleryScreen
+import pl.siedzi.app.ui.gallery.GalleryViewModel
+import pl.siedzi.app.ui.history.HistoryListScreen
+import pl.siedzi.app.ui.history.HistoryListViewModel
 import pl.siedzi.app.ui.fish.FishDetailScreen
 import pl.siedzi.app.ui.fish.FishDetailViewModel
 import pl.siedzi.app.ui.fish.FishListScreen
@@ -111,8 +115,14 @@ fun SiedziNavGraph() {
             )
         }
         composable(SiedziRoute.Wspomnienia.path) {
-            PlaceholderScreen(
-                title = "Wspomnienia",
+            val viewModel: HistoryListViewModel = hiltViewModel()
+            val items by viewModel.historyItems.collectAsState()
+
+            HistoryListScreen(
+                items = items,
+                onSessionClick = { sessionId ->
+                    navController.navigate(SiedziRoute.SessionCard.create(sessionId))
+                },
                 onBack = { navController.popBackStack() }
             )
         }
@@ -166,8 +176,12 @@ fun SiedziNavGraph() {
             )
         }
         composable(SiedziRoute.Galeria.path) {
-            PlaceholderScreen(
-                title = "Galeria",
+            val viewModel: GalleryViewModel = hiltViewModel()
+            val items by viewModel.photoItems.collectAsState()
+
+            GalleryScreen(
+                items = items,
+                onPhotoClick = { /* TODO: PhotoCarouselScreen */ },
                 onBack = { navController.popBackStack() }
             )
         }

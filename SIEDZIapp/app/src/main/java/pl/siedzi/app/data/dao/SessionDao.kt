@@ -22,6 +22,9 @@ interface SessionDao {
     @Query("SELECT * FROM sessions WHERE fishery_id = :fisheryId ORDER BY start_time DESC")
     fun getByFisheryId(fisheryId: String): Flow<List<Session>>
 
+    @Query("SELECT * FROM sessions WHERE is_active = 0 ORDER BY start_time DESC")
+    fun getEndedSessions(): Flow<List<Session>>
+
     @Query("SELECT * FROM sessions WHERE id = :id")
     suspend fun getById(id: String): Session?
 

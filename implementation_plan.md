@@ -34,7 +34,7 @@
 | III | 3.1 | Trip/Session, PlanningFlow, Meldunek, Hub | ✅ |
 | III | 3.2 | TackleSetup, Oś Czasu, Formularz Zasadzki | ✅ |
 | III | 3.3 | Rejestracja Okazu, Catch | ✅ |
-| IV | 4.x | Dashboard Wyprawy, Historia, Galeria | 🔶 4.1 done |
+| IV | 4.x | Dashboard Wyprawy, Historia, Galeria | 🔶 4.1 done, 4.3.1–4.3.2 done |
 | V | 5.x | Drive, MD4, Testy | ❌ |
 
 **Ostatnia aktualizacja:** Faza 4.1 (marzec 2026)

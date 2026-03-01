@@ -4,32 +4,30 @@
 
 | Pole | Wartość |
 |------|---------|
-| **Ostatni checkpoint** | 1.3 ✅ (Splash → Onboarding → Dashboard, 5 kafelków) |
-| **Bieżąca faza** | Etap II, Faza 2.1 |
-| **Cel bieżący** | Zarządzanie bazą łowisk |
+| **Ostatni checkpoint** | 4.3 ✅ (Historia, Galeria) |
+| **Bieżąca faza** | Etap IV – Faza 4.2 / 4.3 kontynuacja |
+| **Cel bieżący** | Wykres brań, PhotoCarousel, filtry historii |
 
 ## Postęp faz
 
 | Etap | Faza | Status | Checkpoint |
 |------|------|--------|------------|
-| I | 1.1 Konfiguracja środowiska | ✅ Ukończone | Checkpoint 1.1 |
-| I | 1.2 Moduł Słownika Ryb | ✅ Ukończone | Checkpoint 1.2 |
-| I | 1.3 Moduł Prawny + Nawigacja | ✅ Ukończone | Checkpoint 1.3 |
-| II | 2.1 Zarządzanie łowiskami | 🔲 Do zrobienia | — |
-| II | 2.2 Integracja map GUGiK | 🔲 Do zrobienia | — |
+| I | 1.1–1.3 Fundamenty | ✅ Ukończone | Checkpoint 1.3 |
+| II | 2.1 Zarządzanie łowiskami | ✅ Ukończone | — |
+| II | 2.2 Integracja map GUGiK | ✅ Ukończone | — |
 | II | 2.3 Pogoda i Solunar | 🔲 Do zrobienia | — |
-| III | 3.1 Dziennik Wyjazdu | 🔲 Do zrobienia | — |
-| III | 3.2 System Kart Brań | 🔲 Do zrobienia | — |
-| III | 3.3 Rejestracja Okazu | 🔲 Do zrobienia | — |
-| IV | 4.1–4.3 Dashboard, wykresy, galeria | 🔲 Do zrobienia | — |
+| III | 3.1–3.3 Dziennik, Sesja, Połowy | ✅ Ukończone | — |
+| IV | 4.1 Karta Sesji, Stats, Bottom Sheet | ✅ Ukończone | Checkpoint 4.1 |
+| IV | 4.2 Wykres brań, notatki strategiczne | 🔲 Do zrobienia | — |
+| IV | 4.3 Historia, Galeria | ✅ Częściowo (Lista, Galeria grid) | — |
 | V | 5.1–5.3 Drive, MD4, Publikacja | 🔲 Do zrobienia | — |
 
-## Najbliższe zadania (Faza 2.1)
+## Najbliższe zadania (Faza 4.2 / 4.3)
 
-- [ ] Model Fishery, DAO
-- [ ] Import CSV/XLSX
-- [ ] Ekran listy łowisk
-- [ ] Formularz dodawania/edycji łowiska
+- [ ] Wykres kaskadowy brań (CatchChartComponent)
+- [ ] Notatki strategiczne na karcie sesji
+- [ ] PhotoCarouselScreen (karuzela zdjęć)
+- [ ] Filtrowanie historii (data, łowisko, gatunek)
 
 ## Odniesienia
 

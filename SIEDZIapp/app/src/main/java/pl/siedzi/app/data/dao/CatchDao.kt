@@ -13,6 +13,9 @@ interface CatchDao {
     @Query("SELECT * FROM catches WHERE session_id = :sessionId ORDER BY timestamp DESC")
     fun getBySessionId(sessionId: String): Flow<List<FishCatch>>
 
+    @Query("SELECT * FROM catches WHERE photo_uris_json IS NOT NULL AND LENGTH(photo_uris_json) > 0 ORDER BY timestamp DESC")
+    fun getCatchesWithPhotos(): Flow<List<FishCatch>>
+
     @Query("SELECT * FROM catches WHERE id = :id")
     suspend fun getById(id: String): FishCatch?
 
