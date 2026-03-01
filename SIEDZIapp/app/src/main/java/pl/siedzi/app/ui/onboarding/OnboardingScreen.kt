@@ -101,7 +101,7 @@ fun OnboardingScreen(
                 TextButton(onClick = onSkip) {
                     Text(
                         text = "Pomiń",
-                        color = Color.White.copy(alpha = 0.5f),
+                        color = Color.White.copy(alpha = 0.55f),
                         fontSize = 14.sp
                     )
                 }

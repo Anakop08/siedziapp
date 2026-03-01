@@ -214,14 +214,14 @@ private fun AddPhotoSlot(onClick: () -> Unit) {
             Icon(
                 Icons.Outlined.Add,
                 contentDescription = null,
-                tint = Color.White.copy(alpha = 0.35f),
+                tint = Color.White.copy(alpha = 0.55f),
                 modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.size(5.dp))
             Text(
                 text = "Dodaj zdjęcie",
                 style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.35f)
+                color = Color.White.copy(alpha = 0.65f)
             )
         }
     }

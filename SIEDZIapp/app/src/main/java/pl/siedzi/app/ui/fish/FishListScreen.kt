@@ -83,6 +83,7 @@ fun FishListScreen(
                 shape = RoundedCornerShape(14.dp)
             )
             LazyColumn(
+                modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {

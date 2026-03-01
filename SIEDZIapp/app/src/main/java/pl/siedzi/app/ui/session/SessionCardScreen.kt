@@ -243,7 +243,7 @@ private fun StatCard(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.5f)
+                color = Color.White.copy(alpha = 0.55f)
             )
         }
     }

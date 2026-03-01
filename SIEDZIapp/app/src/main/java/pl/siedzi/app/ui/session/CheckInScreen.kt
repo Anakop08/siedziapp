@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -58,7 +59,7 @@ fun CheckInScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Default.MyLocation, contentDescription = null)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.size(8.dp))
                 Text("Potwierdź – jestem na stanowisku")
             }
             Spacer(modifier = Modifier.height(12.dp))
