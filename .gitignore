@@ -2,6 +2,7 @@
 .Cursor
 .cursor
 !.cursor/rules/
+!.cursor/skills/
 .idea/
 *.iml
 *.ipr
