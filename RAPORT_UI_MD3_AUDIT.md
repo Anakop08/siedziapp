@@ -112,6 +112,8 @@ Wszystkie zidentyfikowane problemy zostały naprawione.
 3. **Placeholder/tekst na ciemnym tle:** minimum 0.55 (etykiety), 0.65 (placeholder).
 4. **Testy na urządzeniu:** sprawdzić SessionCardScreen, CatchPhotoScreen i FishListScreen na różnych rozdzielczościach.
 
+5. **Tytuły z nazwą łowiska** (marzec 2026): SessionHubScreen, TackleFormScreen, SessionTimelineScreen, ChangeSetupScreen – długa nazwa łowiska nie mieściła się w TopAppBar. Wprowadzono `TopAppBarTitle` z `fillMaxWidth`, `maxLines=1`, `overflow=Ellipsis` i `basicMarquee()` – automatyczne przewijanie gdy tekst przekracza szerokość.
+
 ---
 
 ## Weryfikacja skilla ui-md3-quality-check (1 marca 2026)

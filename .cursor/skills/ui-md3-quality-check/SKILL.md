@@ -106,6 +106,19 @@ Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)
 - Główna treść: `padding(16.dp)` lub `padding(paddingValues)` z Scaffold
 - Między sekcjami: `Spacer(Modifier.height(16.dp))` lub `Arrangement.spacedBy(12.dp)`
 
+**Długi tytuł TopAppBar (np. nazwa łowiska):**
+```kotlin
+title = {
+    Text(
+        text = "Sesja: $fisheryName",
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.fillMaxWidth().basicMarquee()
+    )
+}
+```
+Użyj `TopAppBarTitle` gdy tytuł zawiera dynamiczną, potencjalnie długą wartość.
+
 **Spacer w Row / Button (ikona + tekst):**
 ```kotlin
 // ❌ Błąd – height(8.dp) w Row nie tworzy odstępu poziomego

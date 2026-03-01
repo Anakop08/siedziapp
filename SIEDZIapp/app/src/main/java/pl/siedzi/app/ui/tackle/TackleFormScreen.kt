@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import pl.siedzi.app.ui.components.TopAppBarTitle
 import pl.siedzi.app.ui.theme.EmeraldGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,12 +55,7 @@ fun TackleFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = "Zasadzka · $fisheryName",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
+                title = { TopAppBarTitle("Zasadzka · $fisheryName") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Wstecz")

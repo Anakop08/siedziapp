@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import pl.siedzi.app.ui.components.TopAppBarTitle
 import pl.siedzi.app.ui.theme.CyanTeal
 
 /**
@@ -55,7 +56,7 @@ fun SessionHubScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Sesja: $fisheryName") },
+                title = { TopAppBarTitle("Sesja: $fisheryName") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Wstecz")

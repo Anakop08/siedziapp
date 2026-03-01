@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import pl.siedzi.app.ui.components.TopAppBarTitle
 import pl.siedzi.app.ui.theme.EmeraldGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,12 +54,7 @@ fun ChangeSetupScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = "Zmiana zestawu · $previousTime",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
+                title = { TopAppBarTitle("Zmiana zestawu · $previousTime") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Wstecz")

@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import pl.siedzi.app.ui.components.TopAppBarTitle
 import pl.siedzi.app.ui.theme.Amber
 import pl.siedzi.app.ui.theme.EmeraldGreen
 import java.text.SimpleDateFormat
@@ -54,12 +55,7 @@ fun SessionTimelineScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = "Oś Czasu · $fisheryName",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
+                title = { TopAppBarTitle("Oś Czasu · $fisheryName") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Wstecz")
